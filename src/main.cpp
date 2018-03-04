@@ -2420,8 +2420,10 @@ bool IsInitialBlockDownload()
     static bool lockIBDState = false;
     if (lockIBDState)
         return false;
+
     bool state = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
-                  pindexBestHeader->GetBlockTime() < GetTime() - 6 * 60 * 60); // ~144 blocks behind -> 2 x fork detection time
+                  pindexBestHeader->GetBlockTime() < GetTime() - 24 * 2 * 60 * 60); // ~144 blocks behind -> 2 x fork detection time
+    printf("best height: %u\n", pindexBestHeader->nHeight );
     if (!state)
         lockIBDState = true;
     return state;
