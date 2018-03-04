@@ -190,7 +190,7 @@ public:
         nPoolMaxTransactions = 3;
         strSporkKey = "04B433E6598390C992F4F022F20D3B4CBBE691652EE7C48243B81701CBDB7CC7D7BF0EE09E154E6FCBF2043D65AF4E9E97B89B5DBAF830D83B9B7F469A6C45A717";
         strObfuscationPoolDummyAddress = "D87q2gC9j6nNrnzCsg4aY6bHMLsT9nUhEw";
-        nStartMasternodePayments = 1522798667; // Tuesday, 3 April 2018 23:37:47
+        nStartMasternodePayments = 1520200103; // Sunday, 4 March 2018 21:48:23
 
         /** Zerocoin */
         zerocoinModulus = "b04015c56b641b5627228efdd5c1d483e0b804f66fdf1a112c71d664a3348898a782419e8390276b55dc8724568b107b4e"
