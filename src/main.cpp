@@ -2633,7 +2633,7 @@ void AddInvalidSpendsToMap(const CBlock& block)
 
 // Populate global map (mapInvalidOutPoints) of invalid/fraudulent OutPoints that are banned from being used on the chain.
 CAmount nFilteredThroughBittrex = 0;
-bool fListPopulatedAfterLock = false;
+bool fListPopulatedAfterLock = true;
 void PopulateInvalidOutPointMap()
 {
     if (fListPopulatedAfterLock)
@@ -2721,8 +2721,8 @@ void PopulateInvalidOutPointMap()
             }
         }
 
-        if (pindex->nHeight > Params().Zerocoin_Block_RecalculateAccumulators())
-            fListPopulatedAfterLock = true;
+        // if (pindex->nHeight > Params().Zerocoin_Block_RecalculateAccumulators())
+        //     fListPopulatedAfterLock = true;
     }
 }
 
@@ -3125,17 +3125,17 @@ bool RecalculateGMCNSupply(int nHeightStart)
         nSupplyPrev = pindex->nMoneySupply;
 
         // Add fraudulent funds to the supply and remove any recovered funds.
-        if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators()) {
-            PopulateInvalidOutPointMap();
-            LogPrintf("%s : Original money supply=%s\n", __func__, FormatMoney(pindex->nMoneySupply));
+        // if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators()) {
+        //     PopulateInvalidOutPointMap();
+        //     LogPrintf("%s : Original money supply=%s\n", __func__, FormatMoney(pindex->nMoneySupply));
 
-            pindex->nMoneySupply += nFilteredThroughBittrex;
-            LogPrintf("%s : Adding bittrex filtered funds to supply + %s : supply=%s\n", __func__, FormatMoney(nFilteredThroughBittrex), FormatMoney(pindex->nMoneySupply));
+        //     pindex->nMoneySupply += nFilteredThroughBittrex;
+        //     LogPrintf("%s : Adding bittrex filtered funds to supply + %s : supply=%s\n", __func__, FormatMoney(nFilteredThroughBittrex), FormatMoney(pindex->nMoneySupply));
 
-            CAmount nLocked = GetInvalidUTXOValue();
-            pindex->nMoneySupply -= nLocked;
-            LogPrintf("%s : Removing locked from supply - %s : supply=%s\n", __func__, FormatMoney(nLocked), FormatMoney(pindex->nMoneySupply));
-        }
+        //     CAmount nLocked = GetInvalidUTXOValue();
+        //     pindex->nMoneySupply -= nLocked;
+        //     LogPrintf("%s : Removing locked from supply - %s : supply=%s\n", __func__, FormatMoney(nLocked), FormatMoney(pindex->nMoneySupply));
+        // }
 
         assert(pblocktree->WriteBlockIndex(CDiskBlockIndex(pindex)));
 
@@ -3205,9 +3205,11 @@ bool ReindexAccumulators(list<uint256>& listMissingCheckpoints, string& strError
 bool UpdateZGMCNSupply(const CBlock& block, CBlockIndex* pindex)
 {
     std::list<CZerocoinMint> listMints;
-    bool fFilterInvalid = pindex->nHeight >= Params().Zerocoin_Block_RecalculateAccumulators();
-    BlockToZerocoinMintList(block, listMints, fFilterInvalid);
-    std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
+    // bool fFilterInvalid = pindex->nHeight >= Params().Zerocoin_Block_RecalculateAccumulators();
+    // BlockToZerocoinMintList(block, listMints, fFilterInvalid);
+    BlockToZerocoinMintList(block, listMints, false);
+    // std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
+    std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, false);
 
     // Initialize zerocoin supply to the supply from previous block
     if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion > 3) {
@@ -3401,11 +3403,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     //A one-time event where money supply counts were off and recalculated on a certain block.
-    if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators() + 1) {
-        RecalculateZGMCNMinted();
-        RecalculateZGMCNSpent();
-        RecalculateGMCNSupply(Params().Zerocoin_StartHeight());
-    }
+    // if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators() + 1) {
+    //     RecalculateZGMCNMinted();
+    //     RecalculateZGMCNSpent();
+    //     RecalculateGMCNSupply(Params().Zerocoin_StartHeight());
+    // }
 
     //Track zGMCN money supply in the block index
     if (!UpdateZGMCNSupply(block, pindex))
@@ -3503,8 +3505,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "    - Callbacks: %.2fms [%.2fs]\n", 0.001 * (nTime4 - nTime3), nTimeCallbacks * 0.000001);
 
     //Continue tracking possible movement of fraudulent funds until they are completely frozen
-    if (pindex->nHeight >= Params().Zerocoin_Block_FirstFraudulent() && pindex->nHeight <= Params().Zerocoin_Block_RecalculateAccumulators() + 1)
-        AddInvalidSpendsToMap(block);
+    // if (pindex->nHeight >= Params().Zerocoin_Block_FirstFraudulent() && pindex->nHeight <= Params().Zerocoin_Block_RecalculateAccumulators() + 1)
+    //     AddInvalidSpendsToMap(block);
 
     //Remove zerocoinspends from the pending map
     for (const uint256& txid : vSpendsInBlock) {

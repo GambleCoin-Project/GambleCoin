@@ -185,21 +185,22 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
     CBlockIndex *pindex = chainActive[nHeight - 20];
 
     //On a specific block, a recalculation of the accumulators will be forced
-    if (nHeight == Params().Zerocoin_Block_RecalculateAccumulators()) {
-        pindex = chainActive[Params().Zerocoin_Block_LastGoodCheckpoint() - 10];
-        mapAccumulators.Reset();
-        if (!mapAccumulators.Load(chainActive[Params().Zerocoin_Block_LastGoodCheckpoint()]->nAccumulatorCheckpoint)) {
-            LogPrintf("%s: failed to reset to previous checkpoint when recalculating accumulators\n", __func__);
-            return false;
-        }
-        LogPrintf("*** %s recalculating checkpoint\n", __func__);
+    // No need to recalculate from fresh chain
+    // if (nHeight == Params().Zerocoin_Block_RecalculateAccumulators()) {
+    //     pindex = chainActive[Params().Zerocoin_Block_LastGoodCheckpoint() - 10];
+    //     mapAccumulators.Reset();
+    //     if (!mapAccumulators.Load(chainActive[Params().Zerocoin_Block_LastGoodCheckpoint()]->nAccumulatorCheckpoint)) {
+    //         LogPrintf("%s: failed to reset to previous checkpoint when recalculating accumulators\n", __func__);
+    //         return false;
+    //     }
+    //     LogPrintf("*** %s recalculating checkpoint\n", __func__);
 
-        // Erase the checkpoints from the period of time that bad mints were being made
-        if (!EraseCheckpoints(Params().Zerocoin_Block_LastGoodCheckpoint() + 1, nHeight)) {
-            LogPrintf("%s : failed to erase Checkpoints while recalculating checkpoints\n", __func__);
-            return false;
-        }
-    }
+    //     // Erase the checkpoints from the period of time that bad mints were being made
+    //     if (!EraseCheckpoints(Params().Zerocoin_Block_LastGoodCheckpoint() + 1, nHeight)) {
+    //         LogPrintf("%s : failed to erase Checkpoints while recalculating checkpoints\n", __func__);
+    //         return false;
+    //     }
+    // }
 
     while (pindex->nHeight < nHeight - 10) {
         // checking whether we should stop this process due to a shutdown request
