@@ -2423,7 +2423,7 @@ bool IsInitialBlockDownload()
 
     bool state = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
                   pindexBestHeader->GetBlockTime() < GetTime() - 24 * 2 * 60 * 60); // ~144 blocks behind -> 2 x fork detection time
-    printf("best height: %u\n", pindexBestHeader->nHeight );
+
     if (!state)
         lockIBDState = true;
     return state;
@@ -4337,7 +4337,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
     // Check that the header is valid (particularly PoW).  This is mostly
     // redundant with the call in AcceptBlockHeader.
-    if (!CheckBlockHeader(block, state, block.IsProofOfWork()))
+    if (fCheckPOW && !CheckBlockHeader(block, state, block.IsProofOfWork()))
         return state.DoS(100, error("CheckBlock() : CheckBlockHeader failed"),
             REJECT_INVALID, "bad-header", true);
 

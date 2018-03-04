@@ -120,14 +120,14 @@ public:
 
         /** Height or Time Based Activations **/
         nLastPOWBlock = 259200;
-        nModifierUpdateBlock = 10;
+        nModifierUpdateBlock = 0;
         nZerocoinStartHeight = 863787;
         nZerocoinStartTime = 1522798667; // October 17, 2017 4:30:00 AM
-        nBlockEnforceSerialRange = 10; //Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 10; //Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 10; //First block that bad serials emerged
+        nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
+        nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 0; //First block that bad serials emerged
         nBlockLastGoodCheckpoint = 0; //Last valid accumulator checkpoint
-        nBlockEnforceInvalidUTXO = 10; //Start enforcing the invalid UTXO's
+        nBlockEnforceInvalidUTXO = 0; //Start enforcing the invalid UTXO's
 
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
@@ -193,7 +193,7 @@ public:
         nPoolMaxTransactions = 3;
         strSporkKey = "04B433E6598390C992F4F022F20D3B4CBBE691652EE7C48243B81701CBDB7CC7D7BF0EE09E154E6FCBF2043D65AF4E9E97B89B5DBAF830D83B9B7F469A6C45A717";
         strObfuscationPoolDummyAddress = "D87q2gC9j6nNrnzCsg4aY6bHMLsT9nUhEw";
-        nStartMasternodePayments = 1403728576; //Wed, 25 Jun 2014 20:36:16 GMT
+        nStartMasternodePayments = 1522798667; //Wed, 25 Jun 2014 20:36:16 GMT
 
         /** Zerocoin */
         zerocoinModulus = "b04015c56b641b5627228efdd5c1d483e0b804f66fdf1a112c71d664a3348898a782419e8390276b55dc8724568b107b4e"
