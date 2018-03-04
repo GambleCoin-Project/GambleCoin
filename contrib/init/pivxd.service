@@ -1,19 +1,19 @@
 [Unit]
-Description=PIVX's distributed currency daemon
+Description=GambleCoin's distributed currency daemon
 After=network.target
 
 [Service]
-User=pivx
-Group=pivx
+User=gamblecoin
+Group=gamblecoin
 
 Type=forking
-PIDFile=/var/lib/pivxd/pivxd.pid
+PIDFile=/var/lib/gamblecoind/gamblecoind.pid
 
-ExecStart=/usr/bin/pivxd -daemon -pid=/var/lib/pivxd/pivxd.pid \
-          -conf=/etc/pivx/pivx.conf -datadir=/var/lib/pivxd
+ExecStart=/usr/bin/gamblecoind -daemon -pid=/var/lib/gamblecoind/gamblecoind.pid \
+          -conf=/etc/gamblecoin/gamblecoin.conf -datadir=/var/lib/gamblecoind
 
-ExecStop=-/usr/bin/pivx-cli -conf=/etc/pivx/pivx.conf \
-         -datadir=/var/lib/pivxd stop
+ExecStop=-/usr/bin/gamblecoin-cli -conf=/etc/gamblecoin/gamblecoin.conf \
+         -datadir=/var/lib/gamblecoind stop
 
 Restart=always
 PrivateTmp=true

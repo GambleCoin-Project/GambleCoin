@@ -126,7 +126,7 @@ public:
 };
 
 /**
- * PIVX RPC command dispatcher.
+ * GambleCoin RPC command dispatcher.
  */
 class CRPCTable
 {

@@ -6,13 +6,13 @@ and tests weren't explicitly disabled.
 
 After configuring, they can be run with 'make check'.
 
-To run the pivxd tests manually, launch src/test/test_pivx .
+To run the gamblecoind tests manually, launch src/test/test_gamblecoin .
 
-To add more pivxd tests, add `BOOST_AUTO_TEST_CASE` functions to the existing
+To add more gamblecoind tests, add `BOOST_AUTO_TEST_CASE` functions to the existing
 .cpp files in the test/ directory or add new .cpp files that
 implement new BOOST_AUTO_TEST_SUITE sections.
 
-To run the pivx-qt tests manually, launch src/qt/test/pivx-qt_test
+To run the gamblecoin-qt tests manually, launch src/qt/test/gamblecoin-qt_test
 
-To add more pivx-qt tests, add them to the `src/qt/test/` directory and
+To add more gamblecoin-qt tests, add them to the `src/qt/test/` directory and
 the `src/qt/test/test_main.cpp` file.

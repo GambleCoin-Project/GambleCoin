@@ -1,2 +1,2 @@
-usr/local/bin/pivxd usr/bin
-usr/local/bin/pivx-cli usr/bin
+usr/local/bin/gamblecoind usr/bin
+usr/local/bin/gamblecoin-cli usr/bin

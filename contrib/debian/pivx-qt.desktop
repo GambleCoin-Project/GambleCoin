@@ -1,12 +1,12 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=PIVX
-Comment=PIVX P2P Cryptocurrency
-Comment[fr]=PIVX, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=PIVX, eşten eşe kriptografik sanal para birimi
-Exec=pivx-qt %u
+Name=GambleCoin
+Comment=GambleCoin P2P Cryptocurrency
+Comment[fr]=GambleCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=GambleCoin, eşten eşe kriptografik sanal para birimi
+Exec=gamblecoin-qt %u
 Terminal=false
 Type=Application
-Icon=pivx128
-MimeType=x-scheme-handler/pivx;
+Icon=gamblecoin128
+MimeType=x-scheme-handler/gamblecoin;
 Categories=Office;Finance;

@@ -263,11 +263,11 @@ UniValue stop(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "stop\n"
-            "\nStop PIVX server.");
+            "\nStop GambleCoin server.");
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
-    return "PIVX server stopping";
+    return "GambleCoin server stopping";
 }
 
 
@@ -351,36 +351,36 @@ static const CRPCCommand vRPCCommands[] =
         {"hidden", "reconsiderblock", &reconsiderblock, true, true, false},
         {"hidden", "setmocktime", &setmocktime, true, false, false},
 
-        /* PIVX features */
-        {"pivx", "masternode", &masternode, true, true, false},
-        {"pivx", "listmasternodes", &listmasternodes, true, true, false},
-        {"pivx", "getmasternodecount", &getmasternodecount, true, true, false},
-        {"pivx", "masternodeconnect", &masternodeconnect, true, true, false},
-        {"pivx", "masternodecurrent", &masternodecurrent, true, true, false},
-        {"pivx", "masternodedebug", &masternodedebug, true, true, false},
-        {"pivx", "startmasternode", &startmasternode, true, true, false},
-        {"pivx", "createmasternodekey", &createmasternodekey, true, true, false},
-        {"pivx", "getmasternodeoutputs", &getmasternodeoutputs, true, true, false},
-        {"pivx", "listmasternodeconf", &listmasternodeconf, true, true, false},
-        {"pivx", "getmasternodestatus", &getmasternodestatus, true, true, false},
-        {"pivx", "getmasternodewinners", &getmasternodewinners, true, true, false},
-        {"pivx", "getmasternodescores", &getmasternodescores, true, true, false},
-        {"pivx", "mnbudget", &mnbudget, true, true, false},
-        {"pivx", "preparebudget", &preparebudget, true, true, false},
-        {"pivx", "submitbudget", &submitbudget, true, true, false},
-        {"pivx", "mnbudgetvote", &mnbudgetvote, true, true, false},
-        {"pivx", "getbudgetvotes", &getbudgetvotes, true, true, false},
-        {"pivx", "getnextsuperblock", &getnextsuperblock, true, true, false},
-        {"pivx", "getbudgetprojection", &getbudgetprojection, true, true, false},
-        {"pivx", "getbudgetinfo", &getbudgetinfo, true, true, false},
-        {"pivx", "mnbudgetrawvote", &mnbudgetrawvote, true, true, false},
-        {"pivx", "mnfinalbudget", &mnfinalbudget, true, true, false},
-        {"pivx", "checkbudgets", &checkbudgets, true, true, false},
-        {"pivx", "mnsync", &mnsync, true, true, false},
-        {"pivx", "spork", &spork, true, true, false},
-        {"pivx", "getpoolinfo", &getpoolinfo, true, true, false},
+        /* GambleCoin features */
+        {"gamblecoin", "masternode", &masternode, true, true, false},
+        {"gamblecoin", "listmasternodes", &listmasternodes, true, true, false},
+        {"gamblecoin", "getmasternodecount", &getmasternodecount, true, true, false},
+        {"gamblecoin", "masternodeconnect", &masternodeconnect, true, true, false},
+        {"gamblecoin", "masternodecurrent", &masternodecurrent, true, true, false},
+        {"gamblecoin", "masternodedebug", &masternodedebug, true, true, false},
+        {"gamblecoin", "startmasternode", &startmasternode, true, true, false},
+        {"gamblecoin", "createmasternodekey", &createmasternodekey, true, true, false},
+        {"gamblecoin", "getmasternodeoutputs", &getmasternodeoutputs, true, true, false},
+        {"gamblecoin", "listmasternodeconf", &listmasternodeconf, true, true, false},
+        {"gamblecoin", "getmasternodestatus", &getmasternodestatus, true, true, false},
+        {"gamblecoin", "getmasternodewinners", &getmasternodewinners, true, true, false},
+        {"gamblecoin", "getmasternodescores", &getmasternodescores, true, true, false},
+        {"gamblecoin", "mnbudget", &mnbudget, true, true, false},
+        {"gamblecoin", "preparebudget", &preparebudget, true, true, false},
+        {"gamblecoin", "submitbudget", &submitbudget, true, true, false},
+        {"gamblecoin", "mnbudgetvote", &mnbudgetvote, true, true, false},
+        {"gamblecoin", "getbudgetvotes", &getbudgetvotes, true, true, false},
+        {"gamblecoin", "getnextsuperblock", &getnextsuperblock, true, true, false},
+        {"gamblecoin", "getbudgetprojection", &getbudgetprojection, true, true, false},
+        {"gamblecoin", "getbudgetinfo", &getbudgetinfo, true, true, false},
+        {"gamblecoin", "mnbudgetrawvote", &mnbudgetrawvote, true, true, false},
+        {"gamblecoin", "mnfinalbudget", &mnfinalbudget, true, true, false},
+        {"gamblecoin", "checkbudgets", &checkbudgets, true, true, false},
+        {"gamblecoin", "mnsync", &mnsync, true, true, false},
+        {"gamblecoin", "spork", &spork, true, true, false},
+        {"gamblecoin", "getpoolinfo", &getpoolinfo, true, true, false},
 #ifdef ENABLE_WALLET
-        {"pivx", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
+        {"gamblecoin", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 
         /* Wallet */
         {"wallet", "addmultisigaddress", &addmultisigaddress, true, false, true},
@@ -607,7 +607,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(string methodname, string args)
 {
-    return "> pivx-cli " + methodname + " " + args + "\n";
+    return "> gamblecoin-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(string methodname, string args)
