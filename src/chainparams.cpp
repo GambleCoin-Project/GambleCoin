@@ -121,8 +121,8 @@ public:
         /** Height or Time Based Activations **/
         nLastPOWBlock = 259200;
         nModifierUpdateBlock = 0;
-        nZerocoinStartHeight = 863787;
-        nZerocoinStartTime = 1522798667; // October 17, 2017 4:30:00 AM
+        nZerocoinStartHeight = 863787; // TODO: Add suitable values for these
+        nZerocoinStartTime = 1522798667; // Tuesday, 3 April 2018 23:37:47
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 0; //First block that bad serials emerged
@@ -155,9 +155,6 @@ public:
         genesis.nNonce = 1294455;
 
         hashGenesisBlock = genesis.GetHash();
-        printf("%s\n", hashGenesisBlock.ToString().c_str());
-        // printf("%s\n", genesis.hashMerkleRoot.ToString().c_str());
-        genesis.print();
         assert(hashGenesisBlock == uint256("0x00000ad0f31d7a9e96b81950300618be80c745f099703dfc1f8f7811141384ed"));
         assert(genesis.hashMerkleRoot == uint256("0xc2ca7a6fae3703eafa4b330f9e9c5257dbec64f6358287890f22383ae69239a0"));
 
@@ -193,7 +190,7 @@ public:
         nPoolMaxTransactions = 3;
         strSporkKey = "04B433E6598390C992F4F022F20D3B4CBBE691652EE7C48243B81701CBDB7CC7D7BF0EE09E154E6FCBF2043D65AF4E9E97B89B5DBAF830D83B9B7F469A6C45A717";
         strObfuscationPoolDummyAddress = "D87q2gC9j6nNrnzCsg4aY6bHMLsT9nUhEw";
-        nStartMasternodePayments = 1522798667; //Wed, 25 Jun 2014 20:36:16 GMT
+        nStartMasternodePayments = 1522798667; // Tuesday, 3 April 2018 23:37:47
 
         /** Zerocoin */
         zerocoinModulus = "b04015c56b641b5627228efdd5c1d483e0b804f66fdf1a112c71d664a3348898a782419e8390276b55dc8724568b107b4e"
@@ -244,18 +241,18 @@ public:
         nLastPOWBlock = 200;
         nMaturity = 15;
         nMasternodeCountDrift = 4;
-        nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
+        nModifierUpdateBlock = 0;
         nMaxMoneyOut = 43199500 * COIN;
         nZerocoinStartHeight = 200;
-        nZerocoinStartTime = 1522798667;
-        nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 9908000; //Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 9891737; //First block that bad serials emerged
-        nBlockLastGoodCheckpoint = 9891730; //Last valid accumulator checkpoint
-        nBlockEnforceInvalidUTXO = 9902850; //Start enforcing the invalid UTXO's
+        nZerocoinStartTime = 1520117760; // Saturday, 3 March 2018 22:56:00
+        nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
+        nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
+        nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
+        nBlockLastGoodCheckpoint = 0; //Last valid accumulator checkpoint
+        nBlockEnforceInvalidUTXO = 0; //Start enforcing the invalid UTXO's
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1520117760;
+        genesis.nTime = 1520117760; // Saturday, 3 March 2018 22:56:00
         genesis.nNonce = 2502015;
 
         hashGenesisBlock = genesis.GetHash();
@@ -264,10 +261,10 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed.fuzzbawls.pw"));
-        vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed2.fuzzbawls.pw"));
-        vSeeds.push_back(CDNSSeedData("s3v3nh4cks.ddns.net", "s3v3nh4cks.ddns.net"));
-        vSeeds.push_back(CDNSSeedData("88.198.192.110", "88.198.192.110"));
+        // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed.fuzzbawls.pw"));
+        // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed2.fuzzbawls.pw"));
+        // vSeeds.push_back(CDNSSeedData("s3v3nh4cks.ddns.net", "s3v3nh4cks.ddns.net"));
+        // vSeeds.push_back(CDNSSeedData("88.198.192.110", "88.198.192.110"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet gamblecoin addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet gamblecoin script addresses start with '8' or '9'
@@ -291,7 +288,7 @@ public:
         nPoolMaxTransactions = 2;
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
         strObfuscationPoolDummyAddress = "y57cqfGRkekRyDRNeJiLtYVEbvhXrNbmox";
-        nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
+        nStartMasternodePayments = 1520117760; // Saturday, 3 March 2018 22:56:00
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                        // here because we only have a 8 block finalization window on testnet
     }
