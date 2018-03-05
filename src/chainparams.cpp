@@ -68,7 +68,7 @@ static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
     1740710,
     0,
-    250};
+    0};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of(0, uint256("0x001"));
@@ -116,13 +116,13 @@ public:
         nTargetSpacing = 1 * 60;  // GAMBLECOIN: 1 minute
         nMaturity = 100;
         nMasternodeCountDrift = 20;
-        nMaxMoneyOut = 21000000 * COIN;
+        nMaxMoneyOut = 15600000 * COIN;
 
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 259200;
+        nLastPOWBlock = 200;
         nModifierUpdateBlock = 0;
-        nZerocoinStartHeight = 863787; // TODO: Add suitable values for these
-        nZerocoinStartTime = 1522798667; // Tuesday, 3 April 2018 23:37:47
+        nZerocoinStartHeight = 0;
+        nZerocoinStartTime = 1520274266; // Monday, 5 March 2018 18:24:26
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 0; //First block that bad serials emerged
@@ -144,7 +144,7 @@ public:
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].nValue = 250 * COIN;
+        txNew.vout[0].nValue = 30 * COIN;
         txNew.vout[0].scriptPubKey = CScript() << ParseHex("04c10e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9") << OP_CHECKSIG;
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
@@ -152,11 +152,11 @@ public:
         genesis.nVersion = 1;
         genesis.nTime = 1520117660;
         genesis.nBits = 0x1e0ffff0;
-        genesis.nNonce = 1294455;
+        genesis.nNonce = 19232;
 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000ad0f31d7a9e96b81950300618be80c745f099703dfc1f8f7811141384ed"));
-        assert(genesis.hashMerkleRoot == uint256("0xc2ca7a6fae3703eafa4b330f9e9c5257dbec64f6358287890f22383ae69239a0"));
+        assert(hashGenesisBlock == uint256("0x0000083601e509636901be6882bf942c36c3110bb77365acce6cb1bb5af3e266"));
+        assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
         // TODO
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed.fuzzbawls.pw"));     // Primary DNS Seeder from Fuzzbawls
@@ -190,7 +190,7 @@ public:
         nPoolMaxTransactions = 3;
         strSporkKey = "04B433E6598390C992F4F022F20D3B4CBBE691652EE7C48243B81701CBDB7CC7D7BF0EE09E154E6FCBF2043D65AF4E9E97B89B5DBAF830D83B9B7F469A6C45A717";
         strObfuscationPoolDummyAddress = "D87q2gC9j6nNrnzCsg4aY6bHMLsT9nUhEw";
-        nStartMasternodePayments = 1520200103; // Sunday, 4 March 2018 21:48:23
+        nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
 
         /** Zerocoin */
         zerocoinModulus = "b04015c56b641b5627228efdd5c1d483e0b804f66fdf1a112c71d664a3348898a782419e8390276b55dc8724568b107b4e"
@@ -242,9 +242,9 @@ public:
         nMaturity = 15;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0;
-        nMaxMoneyOut = 43199500 * COIN;
-        nZerocoinStartHeight = 200;
-        nZerocoinStartTime = 1520117760; // Saturday, 3 March 2018 22:56:00
+        nMaxMoneyOut = 15600000 * COIN;
+        nZerocoinStartHeight = 0;
+        nZerocoinStartTime = 1520273549; //  Monday, 5 March 2018 18:12:29
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
         nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
@@ -252,12 +252,12 @@ public:
         nBlockEnforceInvalidUTXO = 0; //Start enforcing the invalid UTXO's
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1520117760; // Saturday, 3 March 2018 22:56:00
-        genesis.nNonce = 2502015;
+        genesis.nTime = 1520273549; // Monday, 5 March 2018 18:12:29
+        genesis.nNonce = 4080330;
 
         hashGenesisBlock = genesis.GetHash();
         // printf("%s\n", hashGenesisBlock.ToString().c_str());
-        assert(hashGenesisBlock == uint256("0x1ee5f83f78aadc15bd9cff46bf778b116405c66b3ef48e864af32a9f05188b06"));
+        assert(hashGenesisBlock == uint256("0x00000913ee74f5160ac5de4ed92e5c8873886fde415978f79e20202fcf2435cc"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -288,7 +288,7 @@ public:
         nPoolMaxTransactions = 2;
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
         strObfuscationPoolDummyAddress = "y57cqfGRkekRyDRNeJiLtYVEbvhXrNbmox";
-        nStartMasternodePayments = 1520117760; // Saturday, 3 March 2018 22:56:00
+        nStartMasternodePayments = 1403728576; //Wed, 25 Jun 2014 20:36:16 GMT
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                        // here because we only have a 8 block finalization window on testnet
     }
@@ -324,12 +324,12 @@ public:
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         genesis.nTime = 1454124731;
         genesis.nBits = 0x207fffff;
-        genesis.nNonce = 12345;
+        genesis.nNonce = 2;
 
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 51476;
         // printf("%s\n", hashGenesisBlock.ToString().c_str());
-        assert(hashGenesisBlock == uint256("0x9eb9cbd9e99707c19b4b5c2e16652713ec35cb274437bb12680891a52eaa7bbb"));
+        assert(hashGenesisBlock == uint256("0x5d19b770edcf3c6efd13e99ba87eaaa9b159ba331c89b7d8bf3468864b97cb83"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Testnet mode doesn't have any DNS seeds.
