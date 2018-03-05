@@ -112,8 +112,8 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // GAMBLECOIN: 1 day
-        nTargetSpacing = 1 * 60;  // GAMBLECOIN: 1 minute
+        nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
+        nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
         nMaturity = 100;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 15600000 * COIN;
@@ -121,8 +121,8 @@ public:
         /** Height or Time Based Activations **/
         nLastPOWBlock = 200;
         nModifierUpdateBlock = 0;
-        nZerocoinStartHeight = 0;
-        nZerocoinStartTime = 1520274266; // Monday, 5 March 2018 18:24:26
+        nZerocoinStartHeight = 22;
+        nZerocoinStartTime = 1520288156; // Monday, 5 March 2018 22:15:56
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 0; //First block that bad serials emerged
@@ -236,15 +236,15 @@ public:
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // GAMBLECOIN: 1 day
-        nTargetSpacing = 1 * 60;  // GAMBLECOIN: 1 minute
+        nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
+        nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
         nLastPOWBlock = 200;
         nMaturity = 15;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 15600000 * COIN;
         nZerocoinStartHeight = 22;
-        nZerocoinStartTime = 1520288156; //  Monday, 5 March 2018 18:12:29
+        nZerocoinStartTime = 1520288156; // Monday, 5 March 2018 22:15:56
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
         nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
@@ -320,7 +320,7 @@ public:
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
         nTargetTimespan = 24 * 60 * 60; // GAMBLECOIN: 1 day
-        nTargetSpacing = 1 * 60;        // GAMBLECOIN: 1 minutes
+        nTargetSpacing = 1 * 90;        // GAMBLECOIN: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         genesis.nTime = 1454124731;
         genesis.nBits = 0x207fffff;
