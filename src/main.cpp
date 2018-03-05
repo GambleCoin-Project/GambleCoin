@@ -2121,11 +2121,14 @@ int64_t GetBlockValue(int nHeight)
     int halvings = nHeight / Params().SubsidyHalvingInterval();
     // After 5th halving all block rewards will be 0.9375 until block 10945968
     if(halvings >= 6)
-        return 0.9375;
+        return 0.9375 * COIN;
     if (nHeight >= 10945968)
         return 0;
 
-    CAmount nSubsidy = 50 * COIN;
+    if(nHeight == 1)
+        return 1560000 * COIN;
+
+    CAmount nSubsidy = 30 * COIN;
     // Subsidy is cut in half every 155,000 blocks which will occur approximately every 6 months.
     nSubsidy >>= halvings;
     return nSubsidy;
