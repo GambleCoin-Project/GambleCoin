@@ -63,10 +63,10 @@ static const Checkpoints::CCheckpointData data = {
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-    boost::assign::map_list_of(0, uint256("0x001"));
+    boost::assign::map_list_of(0, uint256("0x00000913ee74f5160ac5de4ed92e5c8873886fde415978f79e20202fcf2435cc"));
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1740710,
+    1520273549,
     0,
     0};
 
@@ -243,8 +243,8 @@ public:
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 15600000 * COIN;
-        nZerocoinStartHeight = 0;
-        nZerocoinStartTime = 1520273549; //  Monday, 5 March 2018 18:12:29
+        nZerocoinStartHeight = 22;
+        nZerocoinStartTime = 1520288156; //  Monday, 5 March 2018 18:12:29
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
         nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
