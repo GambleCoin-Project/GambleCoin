@@ -27,8 +27,8 @@ int nSubmittedFinalBudget;
 
 int GetBudgetPaymentCycleBlocks()
 {
-    // Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
-    if (Params().NetworkID() == CBaseChainParams::MAIN) return 43200;
+    // Amount of blocks in a months period of time (using 90 seconds per) = (90*24*30)
+    if (Params().NetworkID() == CBaseChainParams::MAIN) return 64800;
     //for testing purposes
 
     return 144; //ten times per day
@@ -833,45 +833,26 @@ CAmount CBudgetManager::GetTotalBudget(int nHeight)
 {
     if (chainActive.Tip() == NULL) return 0;
 
-    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        CAmount nSubsidy = 500 * COIN;
-        return ((nSubsidy / 100) * 10) * 146;
+    CAmount nSubsidy = 30 * COIN;
+
+    int halvings = nHeight / Params().SubsidyHalvingInterval();
+    // After 5th halving all block rewards will be 0.9375 until block 10945968
+    if(halvings >= 6) {
+        nSubsidy = 0.9375 * COIN;
+    } else if (nHeight >= 10945968) {
+        return 0;
+    } else {
+        nSubsidy >>= halvings;
+    }
+
+    if(nHeight == 1){
+        nSubsidy = 1560000 * COIN;
     }
 
     //get block value and calculate from that
-    CAmount nSubsidy = 0;
-    if (nHeight <= Params().LAST_POW_BLOCK() && nHeight >= 151200) {
-        nSubsidy = 50 * COIN;
-    } else if (nHeight <= 302399 && nHeight > Params().LAST_POW_BLOCK()) {
-        nSubsidy = 50 * COIN;
-    } else if (nHeight <= 345599 && nHeight >= 302400) {
-        nSubsidy = 45 * COIN;
-    } else if (nHeight <= 388799 && nHeight >= 345600) {
-        nSubsidy = 40 * COIN;
-    } else if (nHeight <= 431999 && nHeight >= 388800) {
-        nSubsidy = 35 * COIN;
-    } else if (nHeight <= 475199 && nHeight >= 432000) {
-        nSubsidy = 30 * COIN;
-    } else if (nHeight <= 518399 && nHeight >= 475200) {
-        nSubsidy = 25 * COIN;
-    } else if (nHeight <= 561599 && nHeight >= 518400) {
-        nSubsidy = 20 * COIN;
-    } else if (nHeight <= 604799 && nHeight >= 561600) {
-        nSubsidy = 15 * COIN;
-    } else if (nHeight <= 647999 && nHeight >= 604800) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight >= 648000) {
-        nSubsidy = 5 * COIN;
-    } else {
-        nSubsidy = 0 * COIN;
-    }
-
-    // Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
-    if (nHeight <= 172800) {
-        return 648000 * COIN;
-    } else {
-        return ((nSubsidy / 100) * 10) * 1440 * 30;
-    }
+    nSubsidy *= 0.02;
+    // how many blocks in month
+    return ((nSubsidy / 100) * 10) * 90 * 24 * 30;
 }
 
 void CBudgetManager::NewBlock()
@@ -1963,7 +1944,7 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
         return false;
     }
 
-    // Can only pay out 10% of the possible coins (min value of coins)
+    // Can only pay out 2% of the possible coins (min value of coins)
     if (GetTotalPayout() > budget.GetTotalBudget(nBlockStart)) {
         strError = "Budget " + strBudgetName + " Invalid Payout (more than max)";
         return false;
