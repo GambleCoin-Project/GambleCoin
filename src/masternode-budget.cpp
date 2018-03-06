@@ -852,7 +852,7 @@ CAmount CBudgetManager::GetTotalBudget(int nHeight)
     //get block value and calculate from that
     nSubsidy *= 0.02;
     // how many blocks in month
-    return ((nSubsidy / 100) * 10) * 90 * 24 * 30;
+    return ((nSubsidy / 100) * 2) * 90 * 24 * 30;
 }
 
 void CBudgetManager::NewBlock()
