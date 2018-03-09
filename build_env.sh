@@ -28,7 +28,7 @@ export MANPATH=${brew_autoconf}/share/man:$MANPATH
 
 brew_automake=/usr/local/opt/automake
 PATH=${brew_automake}/bin:$PATH
-m4path="${brew_automake}/share/aclocal-1.15:$m4path"
+m4path="${brew_automake}/share/aclocal-1.16:$m4path"
 MANPATH=${brew_automake}/share/man:$MANPATH
 
 brew_openssl=/usr/local/opt/openssl
