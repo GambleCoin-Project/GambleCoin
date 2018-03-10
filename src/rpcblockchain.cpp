@@ -457,7 +457,7 @@ UniValue gettxout(const UniValue& params, bool fHelp)
             "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
             "     \"type\" : \"pubkeyhash\", (string) The type, eg pubkeyhash\n"
             "     \"addresses\" : [          (array of string) array of gamblecoin addresses\n"
-            "     \"pivxaddress\"   	 	(string) gamblecoin address\n"
+            "     \"gmcnaddress\"   	 	(string) gamblecoin address\n"
             "        ,...\n"
             "     ]\n"
             "  },\n"
