@@ -1,5 +1,5 @@
 ---
-name: "gamblecoin-aarch64-3.1"
+name: "gamblecoin-aarch64-1.0"
 enable_cache: true
 suites:
 - "xenial"
