@@ -321,6 +321,9 @@ case $host in
      LEVELDB_TARGET_FLAGS="TARGET_OS=Darwin"
      if  test x$cross_compiling != xyes; then
        BUILD_OS=darwin
+       CPPFLAGS="$CPPFLAGS -mmacosx-version-min=10.9"
+       CXXFLAGS="$CXXFLAGS -mmacosx-version-min=10.9"
+       LIBS="$LIBS -mmacosx-version-min=10.9"
        AC_CHECK_PROG([PORT],port, port)
        if test x$PORT = xport; then
          dnl add default macports paths
