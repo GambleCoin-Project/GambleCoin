@@ -378,6 +378,11 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-sysperms", _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)"));
 #endif
     strUsage += HelpMessageOpt("-txindex", strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), 0));
+    
+    strUsage += HelpMessageOpt("-addressindex", strprintf(_("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)"), DEFAULT_ADDRESSINDEX));
+    strUsage += HelpMessageOpt("-timestampindex", strprintf(_("Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)"), DEFAULT_TIMESTAMPINDEX));
+    strUsage += HelpMessageOpt("-spentindex", strprintf(_("Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)"), DEFAULT_SPENTINDEX));
+
     strUsage += HelpMessageOpt("-forcestart", _("Attempt to force blockchain corruption recovery") + " " + _("on startup"));
 
     strUsage += HelpMessageGroup(_("Connection options:"));
@@ -1342,6 +1347,14 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         }
     }
 
+    // block tree db settings
+    int dbMaxOpenFiles = GetArg("-dbmaxopenfiles", DEFAULT_DB_MAX_OPEN_FILES);
+    bool dbCompression = GetBoolArg("-dbcompression", DEFAULT_DB_COMPRESSION);
+
+    LogPrintf("Block index database configuration:\n");
+    LogPrintf("* Using %d max open files\n", dbMaxOpenFiles);
+    LogPrintf("* Compression is %s\n", dbCompression ? "enabled" : "disabled");
+
     // cache size calculations
     size_t nTotalCache = (GetArg("-dbcache", nDefaultDbCache) << 20);
     if (nTotalCache < (nMinDbCache << 20))
@@ -1349,8 +1362,14 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     else if (nTotalCache > (nMaxDbCache << 20))
         nTotalCache = (nMaxDbCache << 20); // total cache cannot be greater than nMaxDbCache
     size_t nBlockTreeDBCache = nTotalCache / 8;
-    if (nBlockTreeDBCache > (1 << 21) && !GetBoolArg("-txindex", true))
-        nBlockTreeDBCache = (1 << 21); // block tree db cache shouldn't be larger than 2 MiB
+    if (GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) || GetBoolArg("-spentindex", DEFAULT_SPENTINDEX)) {
+        // enable 3/4 of the cache if addressindex and/or spentindex is enabled
+        nBlockTreeDBCache = nTotalCache * 3 / 4;
+    } else {
+        // nBlockTreeDBCache = std::min(nBlockTreeDBCache, (GetBoolArg("-txindex", DEFAULT_TXINDEX) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
+        if (nBlockTreeDBCache > (1 << 21) && !GetBoolArg("-txindex", true))
+            nBlockTreeDBCache = (1 << 21); // block tree db cache shouldn't be larger than 2 MiB
+    }
     nTotalCache -= nBlockTreeDBCache;
     size_t nCoinDBCache = nTotalCache / 2; // use half of the remaining cache for coindb cache
     nTotalCache -= nCoinDBCache;
@@ -1412,6 +1431,24 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // Check for changed -txindex state
                 if (fTxIndex != GetBoolArg("-txindex", true)) {
                     strLoadError = _("You need to rebuild the database using -reindex to change -txindex");
+                    break;
+                }
+
+                // Check for changed -addressindex state
+                if (fAddressIndex != GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX)) {
+                    strLoadError = _("You need to rebuild the database using -reindex-chainstate to change -addressindex");
+                    break;
+                }
+
+                // Check for changed -spentindex state
+                if (fSpentIndex != GetBoolArg("-spentindex", DEFAULT_SPENTINDEX)) {
+                    strLoadError = _("You need to rebuild the database using -reindex-chainstate to change -spentindex");
+                    break;
+                }
+
+                // Check for changed -timestampindex state
+                if (fTimestampIndex != GetBoolArg("-timestampindex", DEFAULT_TIMESTAMPINDEX)) {
+                    strLoadError = _("You need to rebuild the database using -reindex-chainstate to change -timestampindex");
                     break;
                 }
 

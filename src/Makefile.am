@@ -90,6 +90,9 @@ endif
 .PHONY: FORCE
 # gamblecoin core #
 BITCOIN_CORE_H = \
+  addressindex.h \
+  spentindex.h \
+  timestampindex.h \
   activemasternode.h \
   accumulators.h \
   accumulatormap.h \
