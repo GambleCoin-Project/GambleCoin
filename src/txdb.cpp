@@ -18,6 +18,8 @@
 using namespace std;
 using namespace libzerocoin;
 
+static const char DB_ADDRESSINDEX = 'a';
+
 void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
 {
     if (coins.IsPruned())
@@ -182,6 +184,52 @@ bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos>
     for (std::vector<std::pair<uint256, CDiskTxPos> >::const_iterator it = vect.begin(); it != vect.end(); it++)
         batch.Write(make_pair('t', it->first), it->second);
     return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::WriteAddressIndex(const std::vector<std::pair<CAddressIndexKey, CAmount > >&vect) {
+    CLevelDBBatch batch;
+    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
+	    batch.Write(make_pair(DB_ADDRESSINDEX, it->first), it->second);
+    return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type, std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex) {
+
+    // pcursor->Seek(make_pair(DB_ADDRESSINDEX, addressHash)); //TODO include type
+
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSINDEX, addressHash);
+    pcursor->Seek(ssKeySet.str());
+
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        leveldb::Slice slKey = pcursor->key();
+        std::pair<char,CAddressIndexKey> key;
+        try {
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            ssKey >> key;
+        } catch (const std::exception&) {
+            return error("failed to get address index value");
+        }
+        if (key.first == DB_ADDRESSINDEX && key.second.hashBytes == addressHash) {
+            leveldb::Slice slValue = pcursor->value();
+            try{
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                CAmount nValue;
+                ssValue >> nValue;
+                addressIndex.push_back(make_pair(slKey.second, nValue));
+                pcursor->Next();
+            }catch(const std::exception&){
+                return error("failed to get address index value");
+            }
+        } else {
+            break;
+        }
+    }
+
+    return true;
 }
 
 bool CBlockTreeDB::WriteFlag(const std::string& name, bool fValue)
