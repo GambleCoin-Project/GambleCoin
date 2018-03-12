@@ -224,7 +224,7 @@ bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, addressHash);
+    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, CAddressIndexIteratorKey(type, addressHash));
     pcursor->Seek(ssKeySet.str());
 
     while (pcursor->Valid()) {
@@ -288,7 +288,7 @@ bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type, std::vector<s
         pcursor->Seek(ssKeySet.str());
         // pcursor->Seek(make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorKey(type, addressHash)));
     }
-    
+
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
         leveldb::Slice slKey = pcursor->key();
