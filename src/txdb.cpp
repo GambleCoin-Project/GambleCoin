@@ -219,7 +219,7 @@ bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type, std::vector<s
                 CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
                 CAmount nValue;
                 ssValue >> nValue;
-                addressIndex.push_back(make_pair(slKey.second, nValue));
+                addressIndex.push_back(make_pair(key.second, nValue));
                 pcursor->Next();
             }catch(const std::exception&){
                 return error("failed to get address index value");

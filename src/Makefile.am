@@ -93,6 +93,7 @@ BITCOIN_CORE_H = \
   activemasternode.h \
   accumulators.h \
   accumulatormap.h \
+  addressindex.h \
   addrman.h \
   alert.h \
   allocators.h \

@@ -25,6 +25,7 @@
 #include "script/sigcache.h"
 #include "script/standard.h"
 #include "sync.h"
+#include "addressindex.h"
 #include "tinyformat.h"
 #include "txmempool.h"
 #include "uint256.h"
