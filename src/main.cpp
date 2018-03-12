@@ -3382,8 +3382,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 }
             }
 
-            if (fAddressIndex || fSpentIndex)
+            if ((fAddressIndex || fSpentIndex) && !(tx.IsCoinBase() || tx.IsZerocoinSpend()))
             {
+
                 for (size_t j = 0; j < tx.vin.size(); j++) {
 
                     const CTxIn input = tx.vin[j];

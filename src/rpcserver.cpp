@@ -302,6 +302,8 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "getbestblockhash", &getbestblockhash, true, false, false},
         {"blockchain", "getblockcount", &getblockcount, true, false, false},
         {"blockchain", "getblock", &getblock, true, false, false},
+        {"blockchain", "getblockdeltas", &getblockdeltas, false, false, false },
+        {"blockchain", "getblockhashes", &getblockhashes, true, false, false  },
         {"blockchain", "getblockhash", &getblockhash, true, false, false},
         {"blockchain", "getblockheader", &getblockheader, false, false, false},
         {"blockchain", "getchaintips", &getchaintips, true, false, false},
@@ -315,6 +317,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "invalidateblock", &invalidateblock, true, true, false},
         {"blockchain", "reconsiderblock", &reconsiderblock, true, true, false},
         {"blockchain", "verifychain", &verifychain, true, false, false},
+        {"blockchain", "getspentinfo", &getspentinfo, false, false, false},
 
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true, false, false},
@@ -345,6 +348,13 @@ static const CRPCCommand vRPCCommands[] =
         {"util", "verifymessage", &verifymessage, true, false, false},
         {"util", "estimatefee", &estimatefee, true, true, false},
         {"util", "estimatepriority", &estimatepriority, true, true, false},
+
+        /* Address index */
+        { "addressindex",       "getaddressmempool",      &getaddressmempool,      true, false, false  },
+        { "addressindex",       "getaddressutxos",        &getaddressutxos,        false, false, false },
+        { "addressindex",       "getaddressdeltas",       &getaddressdeltas,       false, false, false },
+        { "addressindex",       "getaddresstxids",        &getaddresstxids,        false, false, false },
+        { "addressindex",       "getaddressbalance",      &getaddressbalance,      false, false, false },
 
         /* Not shown in help */
         {"hidden", "invalidateblock", &invalidateblock, true, true, false},
