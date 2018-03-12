@@ -96,6 +96,9 @@ BITCOIN_CORE_H = \
   activemasternode.h \
   accumulators.h \
   accumulatormap.h \
+  addressindex.h \
+  spentindex.h \
+  timestampindex.h \
   addrman.h \
   alert.h \
   allocators.h \
@@ -187,6 +190,8 @@ BITCOIN_CORE_H = \
   version.h \
   wallet.h \
   wallet_ismine.h \
+  compat/byteswap.h \
+  compat/endian.h \
   walletdb.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \

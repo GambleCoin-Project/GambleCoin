@@ -223,19 +223,39 @@ bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
 
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
-    pcursor->Seek(make_pair(DB_ADDRESSUNSPENTINDEX, CAddressIndexIteratorKey(type, addressHash)));
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, addressHash);
+    pcursor->Seek(ssKeySet.str());
 
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
+        leveldb::Slice slKey = pcursor->key();
         std::pair<char,CAddressUnspentKey> key;
-        if (pcursor->GetKey(key) && key.first == DB_ADDRESSUNSPENTINDEX && key.second.hashBytes == addressHash) {
-            CAddressUnspentValue nValue;
-            if (pcursor->GetValue(nValue)) {
+        try {
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            ssKey >> key;
+        } catch (const std::exception&) {
+            return error("failed to get address index value");
+        }
+        // std::pair<char,CAddressUnspentKey> key;
+        if (key.first == DB_ADDRESSUNSPENTINDEX && key.second.hashBytes == addressHash) {
+            leveldb::Slice slValue = pcursor->value();
+            try{
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                CAddressUnspentValue nValue; nValue;
+                ssValue >> nValue;
                 unspentOutputs.push_back(make_pair(key.second, nValue));
                 pcursor->Next();
-            } else {
+            }catch(const std::exception&){
                 return error("failed to get address unspent value");
             }
+            // CAddressUnspentValue nValue;
+            // if (pcursor->GetValue(nValue)) {
+            //     unspentOutputs.push_back(make_pair(key.second, nValue));
+            //     pcursor->Next();
+            // } else {
+            //     return error("failed to get address unspent value");
+            // }
         } else {
             break;
         }
@@ -247,41 +267,39 @@ bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
 bool CBlockTreeDB::WriteAddressIndex(const std::vector<std::pair<CAddressIndexKey, CAmount > >&vect) {
     CLevelDBBatch batch;
     for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
-        batch.Write(make_pair(DB_ADDRESSINDEX, it->first), it->second);
+	    batch.Write(make_pair(DB_ADDRESSINDEX, it->first), it->second);
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::EraseAddressIndex(const std::vector<std::pair<CAddressIndexKey, CAmount > >&vect) {
-    CLevelDBBatch batch;
-    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
-        batch.Erase(make_pair(DB_ADDRESSINDEX, it->first));
-    return WriteBatch(batch);
-}
+bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type, std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex, int start, int end) {
 
-bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type,
-                                    std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
-                                    int start, int end) {
+    // pcursor->Seek(make_pair(DB_ADDRESSINDEX, addressHash)); //TODO include type
 
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
-    if (start > 0 && end > 0) {
-        pcursor->Seek(make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorHeightKey(type, addressHash, start)));
-    } else {
-        pcursor->Seek(make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorKey(type, addressHash)));
-    }
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSINDEX, addressHash);
+    pcursor->Seek(ssKeySet.str());
 
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
+        leveldb::Slice slKey = pcursor->key();
         std::pair<char,CAddressIndexKey> key;
-        if (pcursor->GetKey(key) && key.first == DB_ADDRESSINDEX && key.second.hashBytes == addressHash) {
-            if (end > 0 && key.second.blockHeight > end) {
-                break;
-            }
-            CAmount nValue;
-            if (pcursor->GetValue(nValue)) {
+        try {
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            ssKey >> key;
+        } catch (const std::exception&) {
+            return error("failed to get address index value");
+        }
+        if (key.first == DB_ADDRESSINDEX && key.second.hashBytes == addressHash) {
+            leveldb::Slice slValue = pcursor->value();
+            try{
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                CAmount nValue;
+                ssValue >> nValue;
                 addressIndex.push_back(make_pair(key.second, nValue));
                 pcursor->Next();
-            } else {
+            }catch(const std::exception&){
                 return error("failed to get address index value");
             }
         } else {
@@ -300,14 +318,27 @@ bool CBlockTreeDB::WriteTimestampIndex(const CTimestampIndexKey &timestampIndex)
 
 bool CBlockTreeDB::ReadTimestampIndex(const unsigned int &high, const unsigned int &low, const bool fActiveOnly, std::vector<std::pair<uint256, unsigned int> > &hashes) {
 
+    // boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
+
+    // pcursor->Seek(make_pair(DB_TIMESTAMPINDEX, CTimestampIndexIteratorKey(low)));
+
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
-    pcursor->Seek(make_pair(DB_TIMESTAMPINDEX, CTimestampIndexIteratorKey(low)));
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_TIMESTAMPINDEX, low);
+    pcursor->Seek(ssKeySet.str());
 
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
+        leveldb::Slice slKey = pcursor->key();
         std::pair<char, CTimestampIndexKey> key;
-        if (pcursor->GetKey(key) && key.first == DB_TIMESTAMPINDEX && key.second.timestamp < high) {
+        try {
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            ssKey >> key;
+        } catch (const std::exception&) {
+            return error("failed to get address index value");
+        }
+        if (key.first == DB_TIMESTAMPINDEX && key.second.timestamp < high) {
             if (fActiveOnly) {
                 if (HashOnchainActive(key.second.blockHash)) {
                     hashes.push_back(std::make_pair(key.second.blockHash, key.second.timestamp));
