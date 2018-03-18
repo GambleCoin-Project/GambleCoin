@@ -159,6 +159,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
         // TODO
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed.wildgarlic.fun", "gmcn-dnsseed.wildgarlic.fun"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed.fuzzbawls.pw"));     // Primary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed2.fuzzbawls.pw"));    // Secondary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("coin-server.com", "coin-server.com"));         // Single node address
@@ -261,6 +262,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed-testnet.wildgarlic.fun", "gmcn-dnsseed-testnet.wildgarlic.fun"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed2.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("s3v3nh4cks.ddns.net", "s3v3nh4cks.ddns.net"));
