@@ -103,7 +103,8 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
 {
     bool fRegTest = GetBoolArg("-regtest", false);
     // bool fTestNet = GetBoolArg("-testnet", false);
-    bool fTestNet = GetBoolArg("-testnet", true);
+    // bool fTestNet = GetBoolArg("-testnet", true);
+    bool fTestNet = true;
 
     if (fTestNet && fRegTest)
         return CBaseChainParams::MAX_NETWORK_TYPES;
