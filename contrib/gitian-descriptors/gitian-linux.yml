@@ -29,7 +29,7 @@ packages:
 - "python"
 reference_datetime: "2015-06-01 00:00:00"
 remotes:
-- "url": "git@github.com:CineXMike/GambleCoin.git"
+- "url": "git@github.com:GambleCoin-Project/GambleCoin.git"
   "dir": "GambleCoin"
 files: []
 script: |
