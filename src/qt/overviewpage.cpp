@@ -209,11 +209,14 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
         nWatchOnlyLockedBalance = pwalletMain->GetLockedWatchOnlyBalance();
     }
     // PIV Balance
-    CAmount nTotalBalance = balance + unconfirmedBalance + nLockedBalance;
-    CAmount pivAvailableBalance = balance - immatureBalance;
-    CAmount nTotalWatchBalance = watchOnlyBalance + watchUnconfBalance + watchImmatureBalance;    
-    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance - nLockedBalance; // increment nLockedBalance twice because it was added to
-                                                                                // nTotalBalance above
+    CAmount nTotalBalance = balance + unconfirmedBalance;
+    CAmount pivAvailableBalance = balance - immatureBalance - nLockedBalance;
+    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance;
+
+    // PIV Watch-Only Balance
+    CAmount nTotalWatchBalance = watchOnlyBalance + watchUnconfBalance;
+    CAmount nAvailableWatchBalance = watchOnlyBalance - watchImmatureBalance - nWatchOnlyLockedBalance;
+
     // zPIV Balance
     CAmount matureZerocoinBalance = zerocoinBalance - unconfirmedZerocoinBalance - immatureZerocoinBalance;
     // Percentages
@@ -232,7 +235,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelTotal->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, nTotalBalance, false, BitcoinUnits::separatorAlways));
 
     // Watchonly labels
-    ui->labelWatchAvailable->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchOnlyBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelWatchAvailable->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, nAvailableWatchBalance, false, BitcoinUnits::separatorAlways));
     ui->labelWatchPending->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchUnconfBalance, false, BitcoinUnits::separatorAlways));
     ui->labelWatchImmature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchImmatureBalance, false, BitcoinUnits::separatorAlways));
     ui->labelWatchLocked->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, nWatchOnlyLockedBalance, false, BitcoinUnits::separatorAlways));
@@ -270,27 +273,37 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     bool showSumAvailable = settingShowAllBalances || sumTotalBalance != availableTotalBalance;
     ui->labelBalanceTextz->setVisible(showSumAvailable);
     ui->labelBalancez->setVisible(showSumAvailable);
-    bool showGMCNAvailable = settingShowAllBalances || pivAvailableBalance != nTotalBalance;
-    bool showWatchOnlyGMCNAvailable = watchOnlyBalance != nTotalWatchBalance;
-    bool showGMCNPending = settingShowAllBalances || unconfirmedBalance != 0;
-    bool showWatchOnlyGMCNPending = watchUnconfBalance != 0;
-    bool showGMCNLocked = settingShowAllBalances || nLockedBalance != 0;
-    bool showWatchOnlyGMCNLocked = nWatchOnlyLockedBalance != 0;
-    bool showImmature = settingShowAllBalances || immatureBalance != 0;
-    bool showWatchOnlyImmature = watchImmatureBalance != 0;
     bool showWatchOnly = nTotalWatchBalance != 0;
-    ui->labelBalance->setVisible(showGMCNAvailable || showWatchOnlyGMCNAvailable);
+
+    // GMCN Available
+    bool showGMCNAvailable = settingShowAllBalances || pivAvailableBalance != nTotalBalance;
+    bool showWatchOnlyGMCNAvailable = settingShowAllBalances || nAvailableWatchBalance != nTotalWatchBalance;
     ui->labelBalanceText->setVisible(showGMCNAvailable || showWatchOnlyGMCNAvailable);
-    ui->labelWatchAvailable->setVisible(showGMCNAvailable && showWatchOnly);
-    ui->labelUnconfirmed->setVisible(showGMCNPending || showWatchOnlyGMCNPending);
+    ui->labelBalance->setVisible(showGMCNAvailable || showWatchOnlyGMCNAvailable);
+    ui->labelWatchAvailable->setVisible(showWatchOnlyGMCNAvailable && showWatchOnly);
+
+    // GMCN Pending
+    bool showGMCNPending = settingShowAllBalances || unconfirmedBalance != 0;
+    bool showWatchOnlyGMCNPending = settingShowAllBalances || watchUnconfBalance != 0;
     ui->labelPendingText->setVisible(showGMCNPending || showWatchOnlyGMCNPending);
-    ui->labelWatchPending->setVisible(showGMCNPending && showWatchOnly);
-    ui->labelLockedBalance->setVisible(showGMCNLocked || showWatchOnlyGMCNLocked);
+    ui->labelUnconfirmed->setVisible(showGMCNPending || showWatchOnlyGMCNPending);
+    ui->labelWatchPending->setVisible(showWatchOnlyGMCNPending && showWatchOnly);
+
+    // GMCN Immature
+    bool showGMCNImmature = settingShowAllBalances || immatureBalance != 0;
+    bool showWatchOnlyImmature = settingShowAllBalances || watchImmatureBalance != 0;
+    ui->labelImmatureText->setVisible(showGMCNImmature || showWatchOnlyImmature);
+    ui->labelImmature->setVisible(showGMCNImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
+    ui->labelWatchImmature->setVisible(showWatchOnlyImmature && showWatchOnly); // show watch-only immature balance
+
+    // GMCN Locked
+    bool showGMCNLocked = settingShowAllBalances || nLockedBalance != 0;
+    bool showWatchOnlyGMCNLocked = settingShowAllBalances || nWatchOnlyLockedBalance != 0;
     ui->labelLockedBalanceText->setVisible(showGMCNLocked || showWatchOnlyGMCNLocked);
-    ui->labelWatchLocked->setVisible(showGMCNLocked && showWatchOnly);
-    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
-    ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
-    ui->labelWatchImmature->setVisible(showImmature && showWatchOnly); // show watch-only immature balance
+    ui->labelLockedBalance->setVisible(showGMCNLocked || showWatchOnlyGMCNLocked);
+    ui->labelWatchLocked->setVisible(showWatchOnlyGMCNLocked && showWatchOnly);
+
+    // zGMCN
     bool showzGMCNAvailable = settingShowAllBalances || zerocoinBalance != matureZerocoinBalance;
     bool showzGMCNUnconfirmed = settingShowAllBalances || unconfirmedZerocoinBalance != 0;
     bool showzGMCNImmature = settingShowAllBalances || immatureZerocoinBalance != 0;
@@ -300,6 +313,8 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelzBalanceUnconfirmedText->setVisible(showzGMCNUnconfirmed);
     ui->labelzBalanceImmature->setVisible(showzGMCNImmature);
     ui->labelzBalanceImmatureText->setVisible(showzGMCNImmature);
+
+    // Percent split
     bool showPercentages = ! (zerocoinBalance == 0 && nTotalBalance == 0);
     ui->labelGMCNPercent->setVisible(showPercentages);
     ui->labelzGMCNPercent->setVisible(showPercentages);
