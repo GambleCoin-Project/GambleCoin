@@ -15,6 +15,7 @@
 #include "utilmoneystr.h"
 
 #include <univalue.h>
+#include <hash.h>
 
 #include <fstream>
 using namespace std;
@@ -851,6 +852,67 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
     } else {
         return "Error voting : " + strError;
     }
+}
+
+int returnVal(char x)
+{
+    return (int)x - 87;
+}
+
+int getrandomint()
+{
+    return (int)(rand() % 100000 + 100);
+}
+
+int combine(int x, int y)
+{
+    int z;
+    if(y >= 10)
+        x *= 10;
+    x *= 10;
+    z = x + y;
+    return z;
+}
+
+
+
+UniValue getrandomnumber(const UniValue& params, bool fHelp)
+{
+   
+
+ 
+    int64_t lastBlockNumber = chainActive.Height() - 1;
+    CBlockIndex* pblockindex = chainActive[lastBlockNumber];
+    string hashVal = pblockindex->GetBlockHash().GetHex();
+    int result = 0;
+    int random = 0;
+    int randomfirst = 0;
+    int randomsecond = 0;
+    int randomthird = 0;
+    int randomfourth = 0;
+    unsigned int i = 0;
+    
+    for ( i = 0; i < hashVal.size(); i++ )          // loop through characters of string
+    {
+        result = result + returnVal(hashVal[i]);
+    }
+    UniValue o(UniValue::VOBJ);
+
+    random = getrandomint();
+    randomfirst = random + getrandomint();
+    randomsecond = randomfirst + getrandomint();
+    randomthird = randomsecond + getrandomint();
+    randomfourth = randomthird + getrandomint();
+    result = result + randomfourth;
+    
+    if(params.size() != 0){
+         int uservar = params[0].get_int();
+         result = result + uservar; 
+    }
+    return result;
+    
+
+    
 }
 
 UniValue mnfinalbudget(const UniValue& params, bool fHelp)
