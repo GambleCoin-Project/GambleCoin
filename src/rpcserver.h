@@ -315,7 +315,7 @@ extern UniValue getbudgetinfo(const UniValue& params, bool fHelp);
 extern UniValue mnbudgetrawvote(const UniValue& params, bool fHelp);
 extern UniValue mnfinalbudget(const UniValue& params, bool fHelp);
 extern UniValue checkbudgets(const UniValue& params, bool fHelp);
-
+extern UniValue getrandomnumber(const UniValue& params, bool fHelp);
 extern UniValue getinfo(const UniValue& params, bool fHelp); // in rpcmisc.cpp
 extern UniValue mnsync(const UniValue& params, bool fHelp);
 extern UniValue spork(const UniValue& params, bool fHelp);

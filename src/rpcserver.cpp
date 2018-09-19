@@ -389,6 +389,7 @@ static const CRPCCommand vRPCCommands[] =
         {"gamblecoin", "mnsync", &mnsync, true, true, false},
         {"gamblecoin", "spork", &spork, true, true, false},
         {"gamblecoin", "getpoolinfo", &getpoolinfo, true, true, false},
+		{"gamblecoin", "getrandomnumber", &getrandomnumber, true, true, false},
 #ifdef ENABLE_WALLET
         {"gamblecoin", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 
