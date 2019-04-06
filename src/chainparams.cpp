@@ -160,7 +160,36 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
         // TODO
-        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed.wildgarlic.fun", "gmcn-dnsseed.wildgarlic.fun"));
+        vSeeds.push_back(CDNSSeedData("45.63.9.248", "45.63.9.248"));
+        vSeeds.push_back(CDNSSeedData("149.28.58.153", "149.28.58.153"));
+        vSeeds.push_back(CDNSSeedData("199.247.20.46", "199.247.20.46"));
+        vSeeds.push_back(CDNSSeedData("95.179.155.34", "95.179.155.34"));
+        vSeeds.push_back(CDNSSeedData("144.202.24.71", "144.202.24.71"));
+        vSeeds.push_back(CDNSSeedData("45.63.64.91", "45.63.64.91"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-info.com", 
+                                      "gmcn-dnsseed1.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-info.com", 
+                                      "gmcn-dnsseed2.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed3.gamblecoin-info.com", 
+                                      "gmcn-dnsseed3.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed4.gamblecoin-info.com", 
+                                      "gmcn-dnsseed4.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed5.gamblecoin-info.com", 
+                                      "gmcn-dnsseed5.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed6.gamblecoin-info.com", 
+                                      "gmcn-dnsseed6.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed1.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed2.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed3.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed3.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed4.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed4.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed5.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed5.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed6.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed6.gamblecoin-casino.com"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed.fuzzbawls.pw"));     // Primary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed2.fuzzbawls.pw"));    // Secondary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("coin-server.com", "coin-server.com"));         // Single node address
