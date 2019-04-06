@@ -9,7 +9,7 @@ GambleCoin is an open source crypto-currency focused on fast private transaction
 - Fast transactions featuring guaranteed zero confirmation transactions, we call it _SwiftX_.
 - Decentralized blockchain voting utilizing Masternode technology to form a DAO. The blockchain will distribute monthly treasury funds based on successful proposals submitted by the community and voted on by the DAO.
 
-More information at [gamblecoin-info.com](http://www.gamblecoin-info.com) 
+More information at [gamblecoin-info.com](http://www.gamblecoin-info.com) Visit our ANN thread at [BitcoinTalk](https://bitcointalk.org/index.php?topic=3256681.0)
 
 ### Coin Specs
 <table>
