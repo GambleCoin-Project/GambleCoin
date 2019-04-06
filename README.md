@@ -38,11 +38,11 @@ More information at [gamblecoin-info.com](http://www.gamblecoin-info.com)
 ### PoS Rewards Breakdown
 
 <table>
-<th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th>
-<tr><td>Phase 1</td><td>201-210,000</td><td>30 GMCN</td><td>Seesaw Balance</td></tr>
-<tr><td>Phase 2</td><td>210,001-420,000</td><td>15 GMCN</td><td>Seesaw Balance</td></tr>
-<tr><td>Phase 3</td><td>420,001-630,000</td><td>7.5 GMCN</td><td>Seesaw Balance</td></tr>
-<tr><td>Phase 4</td><td>630,001-840,000</td><td>3.75 GMCN</td><td>Seesaw Balance</td></tr>
-<tr><td>Phase 5</td><td>840,001-1,050,000</td><td>1.875 GMCN</td><td>Seesaw Balance</td></tr>
-<tr><td>Phase 6</td><td>1,050,001+</td><td>0.9375 GMCN</td><td>Seesaw Balance</td></tr>
+  <th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th><th>Supply</th>
+  <tr><td>Phase 1</td><td>201-210,000</td><td>30 GMCN</td><td>Seesaw Balance</td><td>7,859,910</td></tr>
+<tr><td>Phase 2</td><td>210,001-420,000</td><td>15 GMCN</td><td>Seesaw Balance</td><td>11,009,895</td></tr>
+<tr><td>Phase 3</td><td>420,001-630,000</td><td>7.5 GMCN</td><td>Seesaw Balance</td><td>12,584,888</td></tr>
+<tr><td>Phase 4</td><td>630,001-840,000</td><td>3.75 GMCN</td><td>Seesaw Balance</td><td>13,372,384</td></tr>
+<tr><td>Phase 5</td><td>840,001-1,050,000</td><td>1.875 GMCN</td><td>Seesaw Balance</td><td>13,766,132</td></tr>
+<tr><td>Phase 6</td><td>1,050,001-3,006,127</td><td>0.9375 GMCN</td><td>Seesaw Balance</td><td>15,600,000</td></tr>
 </table>
