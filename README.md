@@ -31,24 +31,18 @@ More information at [gamblecoin-info.com](http://www.gamblecoin-info.com)
 ### PoW Rewards Breakdown
 
 <table>
-<th>Block Height</th><th>Masternodes</th><th>Miner</th><th>Budget</th>
-<tr><td>2-43200</td><td>20% (50 GMCN)</td><td>80% (200 GMCN)</td><td>N/A</td></tr>
-<tr><td>43201-151200</td><td>20% (50 GMCN)</td><td>70% (200 GMCN)</td><td>10% (25 GMCN)</td></tr>
-<tr><td>151201-259200</td><td>45% (22.5 GMCN)</td><td>45% (22.5 GMCN)</td><td>10% (5 GMCN)</td></tr>
+<th>Block Height</th><th>Miner</th>
+<tr><td>1-200</td><td>30 GMCN</td></tr>
 </table>
 
 ### PoS Rewards Breakdown
 
 <table>
-<th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th><th>Budget</th>
-<tr><td>Phase 1</td><td>259201-302399</td><td>50 GMCN</td><td>90% (45 GMCN)</td><td>10% (5 GMCN)</td></tr>
-<tr><td>Phase 2</td><td>302400-345599</td><td>45 GMCN</td><td>90% (40.5 GMCN)</td><td>10% (4.5 GMCN)</td></tr>
-<tr><td>Phase 3</td><td>345600-388799</td><td>40 GMCN</td><td>90% (36 GMCN)</td><td>10% (4 GMCN)</td></tr>
-<tr><td>Phase 4</td><td>388800-431999</td><td>35 GMCN</td><td>90% (31.5 GMCN)</td><td>10% (3.5 GMCN)</td></tr>
-<tr><td>Phase 5</td><td>432000-475199</td><td>30 GMCN</td><td>90% (27 GMCN)</td><td>10% (3 GMCN)</td></tr>
-<tr><td>Phase 6</td><td>475200-518399</td><td>25 GMCN</td><td>90% (22.5 GMCN)</td><td>10% (2.5 GMCN)</td></tr>
-<tr><td>Phase 7</td><td>518400-561599</td><td>20 GMCN</td><td>90% (18 GMCN)</td><td>10% (2 GMCN)</td></tr>
-<tr><td>Phase 8</td><td>561600-604799</td><td>15 GMCN</td><td>90% (13.5 GMCN)</td><td>10% (1.5 GMCN)</td></tr>
-<tr><td>Phase 9</td><td>604800-647999</td><td>10 GMCN</td><td>90% (9 GMCN)</td><td>10% (1 GMCN)</td></tr>
-<tr><td>Phase X</td><td>648000-Infinite</td><td>5 GMCN</td><td>90% (4.5 GMCN)</td><td>10% (0.5 GMCN)</td></tr>
+<th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th>
+<tr><td>Phase 1</td><td>201-210,000</td><td>30 GMCN</td><td>Seesaw Balance</td></tr>
+<tr><td>Phase 2</td><td>210,001-420,000</td><td>15 GMCN</td><td>Seesaw Balance</td></tr>
+<tr><td>Phase 3</td><td>420,001-630,000</td><td>7.5 GMCN</td><td>Seesaw Balance</td></tr>
+<tr><td>Phase 4</td><td>630,001-840,000</td><td>3.75 GMCN</td><td>Seesaw Balance</td></tr>
+<tr><td>Phase 5</td><td>840,001-1,050,000</td><td>1.875 GMCN</td><td>Seesaw Balance</td></tr>
+<tr><td>Phase 6</td><td>1,050,001+</td><td>0.9375 GMCN</td><td>Seesaw Balance</td></tr>
 </table>
