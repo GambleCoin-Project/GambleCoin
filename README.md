@@ -5,19 +5,19 @@ GambleCoin Core integration/staging repository
 [![Build Status](https://travis-ci.org/GambleCoin-Project/GambleCoin.svg?branch=master)](https://travis-ci.org/GambleCoin-Project/GambleCoin) [![GitHub version](https://badge.fury.io/gh/GambleCoin-Project%2Fgamblecoin.svg)](https://badge.fury.io/gh/GambleCoin-Project%2Fgamblecoin)
 
 GambleCoin is an open source crypto-currency focused on fast private transactions with low transaction fees & environmental footprint.  It utilizes a custom Proof of Stake protocol for securing its network and uses an innovative variable seesaw reward mechanism that dynamically balances 90% of its block reward size between masternodes and staking nodes and 10% dedicated for budget proposals. The goal of GambleCoin is to achieve a decentralized sustainable crypto currency with near instant full-time private transactions, fair governance and community intelligence.
-- Anonymized transactions using the [_Zerocoin Protocol_](http://www.gamblecoin.org/zpiv).
+- Anonymized transactions.
 - Fast transactions featuring guaranteed zero confirmation transactions, we call it _SwiftX_.
 - Decentralized blockchain voting utilizing Masternode technology to form a DAO. The blockchain will distribute monthly treasury funds based on successful proposals submitted by the community and voted on by the DAO.
 
-More information at [gamblecoin.org](http://www.gamblecoin.org) Visit our ANN thread at [BitcoinTalk](http://www.bitcointalk.org/index.php?topic=1262920)
+More information at [gamblecoin.fun](http://www.gamblecoin.fun) Visit our ANN thread at [BitcoinTalk](https://bitcointalk.org/index.php?topic=3256681.0)
 
 ### Coin Specs
 <table>
 <tr><td>Algo</td><td>Quark</td></tr>
 <tr><td>Block Time</td><td>90 Seconds</td></tr>
 <tr><td>Difficulty Retargeting</td><td>Every Block</td></tr>
-<tr><td>Max Coin Supply</td><td>15.600.000 GMCN</td></tr>
-<tr><td>Premine</td><td>5% GMCN*</td></tr>
+<tr><td>Max Coin Supply</td><td>15,600,000 GMCN</td></tr>
+<tr><td>Premine</td><td>10% GMCN*</td></tr>
 </table>
 
 ### Reward Distribution
@@ -25,7 +25,7 @@ More information at [gamblecoin.org](http://www.gamblecoin.org) Visit our ANN th
 <table>
 <th colspan=4>Genesis Block</th>
 <tr><th>Block Height</th><th>Reward Amount</th><th>Notes</th></tr>
-<tr><td>1</td><td>60,000 GMCN</td><td>Initial Pre-mine, burnt in block <a href="http://www.presstab.pw/phpexplorer/GambleCoin/block.php?blockhash=206d9cfe859798a0b0898ab00d7300be94de0f5469bb446cecb41c3e173a57e0">279917</a></td></tr>
+<tr><td>2</td><td>1,560,000 GMCN</td><td>Initial Pre-mine</td></tr>
 </table>
 
 ### PoW Rewards Breakdown
