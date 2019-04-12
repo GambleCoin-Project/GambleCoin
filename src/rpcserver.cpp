@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The Gamblecoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -410,7 +411,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "getreceivedbyaccount", &getreceivedbyaccount, false, false, true},
         {"wallet", "getreceivedbyaddress", &getreceivedbyaddress, false, false, true},
         {"wallet", "getstakingstatus", &getstakingstatus, false, false, true},
-        {"wallet", "getstakesplitthreshold", &getstakesplitthreshold, false, false, true},
+        {"wallet", "getstakesplitthreshold", &getstakesplitthreshold, false, false, true},         {"wallet", "getautocombineinfo", &getautocombineinfo, false, false, true},
         {"wallet", "gettransaction", &gettransaction, false, false, true},
         {"wallet", "getunconfirmedbalance", &getunconfirmedbalance, false, false, true},
         {"wallet", "getwalletinfo", &getwalletinfo, false, false, true},

@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The Gamblecoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -1658,7 +1659,7 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp)
         throw runtime_error(
             "walletpassphrase \"passphrase\" timeout ( anonymizeonly )\n"
             "\nStores the wallet decryption key in memory for 'timeout' seconds.\n"
-            "This is needed prior to performing transactions related to private keys such as sending PIVs\n"
+            "This is needed prior to performing transactions related to private keys such as sending GMCNs\n"
             "\nArguments:\n"
             "1. \"passphrase\"     (string, required) The wallet passphrase\n"
             "2. timeout            (numeric, required) The time to keep the decryption key in seconds.\n"
@@ -1801,7 +1802,7 @@ UniValue encryptwallet(const UniValue& params, bool fHelp)
             "\nExamples:\n"
             "\nEncrypt you wallet\n" +
             HelpExampleCli("encryptwallet", "\"my pass phrase\"") +
-            "\nNow set the passphrase to use the wallet, such as for signing or sending PIVs\n" + HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
+            "\nNow set the passphrase to use the wallet, such as for signing or sending GMCNs\n" + HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
             "\nNow we can so something like sign\n" + HelpExampleCli("signmessage", "\"gmcnaddress\" \"test message\"") +
             "\nNow lock the wallet again by removing the passphrase\n" + HelpExampleCli("walletlock", "") +
             "\nAs a json rpc call\n" + HelpExampleRpc("encryptwallet", "\"my pass phrase\""));
@@ -1841,7 +1842,7 @@ UniValue lockunspent(const UniValue& params, bool fHelp)
             "lockunspent unlock [{\"txid\":\"txid\",\"vout\":n},...]\n"
             "\nUpdates list of temporarily unspendable outputs.\n"
             "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
-            "A locked transaction output will not be chosen by automatic coin selection, when spending PIVs.\n"
+            "A locked transaction output will not be chosen by automatic coin selection, when spending GMCNs.\n"
             "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
             "is always cleared (by virtue of process exit) when a node stops or fails.\n"
             "Also see the listunspent call\n"
@@ -1958,7 +1959,7 @@ UniValue settxfee(const UniValue& params, bool fHelp)
             "settxfee amount\n"
             "\nSet the transaction fee per kB.\n"
             "\nArguments:\n"
-            "1. amount         (numeric, required) The transaction fee in PIV/kB rounded to the nearest 0.00000001\n"
+            "1. amount         (numeric, required) The transaction fee in GMCN/kB rounded to the nearest 0.00000001\n"
             "\nResult\n"
             "true|false        (boolean) Returns true if successful\n"
             "\nExamples:\n" +
@@ -1984,7 +1985,7 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,         (numeric) the total PIV balance of the wallet\n"
+            "  \"balance\": xxxxxxx,         (numeric) the total GMCN balance of the wallet\n"
             "  \"txcount\": xxxxxxx,         (numeric) the total number of transactions in the wallet\n"
             "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
             "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
@@ -2106,37 +2107,97 @@ UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
     return int(pwalletMain->nStakeSplitThreshold);
 }
 
+UniValue getautocombineinfo(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getautocombineinfo\n"
+            "Returns the autocombinerewards settings\n");
+
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("autocombine set to <on/off>  ", int(pwalletMain->fCombineDust)));
+    if (pwalletMain->fCombineDust) {
+        obj.push_back(Pair("autocombine threshold set to <Coin Amount>",
+                           int(pwalletMain->nAutoCombineThreshold)));
+        if (0 == pwalletMain->nAutoCombineBlockFrequency) {
+            obj.push_back(Pair("autocombine set to one time", "on next block"));
+        } else {
+            obj.push_back(Pair("autocombine block frequency set to ",
+                           int(pwalletMain->nAutoCombineBlockFrequency)));
+        }
+    }
+    else {
+        if (0 == pwalletMain->nAutoCombineBlockFrequency) {
+            obj.push_back(Pair("autocombine threshold set to <Coin Amount>",
+                               int(pwalletMain->nAutoCombineThreshold)));
+            obj.push_back(Pair("autocombine set to one time","on startup"));
+        }
+    }
+
+    return obj;
+}
+
 UniValue autocombinerewards(const UniValue& params, bool fHelp)
 {
-    bool fEnable;
-    if (params.size() >= 1)
-        fEnable = params[0].get_bool();
+    string strCommand;
+    bool fEnable = false;
 
-    if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
+    if (params.size() >= 1) {
+        fEnable = params[0].get_bool();
+    }
+
+    if (fHelp || params.size() < 1 || (fEnable && params.size() < 2) || params.size() > 3)
         throw runtime_error(
-            "autocombinerewards true|false ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same GambleCoin address\n"
-            "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
+            "autocombinerewards true|false|onetime ( threshold ) ( frequency )\n"
+            "\nWallet will automatically monitor for UTXOs with values below the threshold amount, "
+            "and combine them into transactions sized to the threshold amount, if they reside with "
+            "the same UCC address.\n"
+            "\nA frequency value of \"0\" will run the sweep on the next available block, once on every startup.\n"
+            "\nWhen autocombinerewards runs it will create a transaction, and therefore will be subject "
+            "to transaction fees.  Transactions will be limited to a full combine of the threshold "
+            "amount unless the transaction fees are zero.\n"
 
             "\nArguments:\n"
-            "1. true|false      (boolean, required) Enable auto combine (true) or disable (false)\n"
-            "2. threshold       (numeric, optional) Threshold amount (default: 0)\n"
+            "1. true|false  (boolean, required) Enable auto combine (true) or disable (false)\n"
+            "2. threshold   (numeric, required) Threshold amount (default: 0)\n"
+            "3. frequency   (numeric, optional) Frequency (in blocks) for autocombine to run (default: 15)\n"
             "\nExamples:\n" +
-            HelpExampleCli("autocombinerewards", "true 500") + HelpExampleRpc("autocombinerewards", "true 500"));
+            HelpExampleCli("autocombinerewards", "true 500 15") + HelpExampleRpc("autocombinerewards", "true 500 15"));
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
     CAmount nThreshold = 0;
+    int nBlockFrequency = 15;
 
-    if (fEnable)
+    if (fEnable) {
         nThreshold = params[1].get_int();
+        if (params.size() > 2) {
+            nBlockFrequency = params[2].get_int();
+            if (nBlockFrequency < 0)
+                nBlockFrequency = 1;
+        }
+    }
 
     pwalletMain->fCombineDust = fEnable;
     pwalletMain->nAutoCombineThreshold = nThreshold;
+    pwalletMain->nAutoCombineBlockFrequency = nBlockFrequency;
 
-    if (!walletdb.WriteAutoCombineSettings(fEnable, nThreshold))
+    if (!walletdb.WriteAutoCombineSettings(fEnable, nThreshold, nBlockFrequency))
         throw runtime_error("Changed settings in wallet but failed to save to database\n");
 
-    return NullUniValue;
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("autocombine set to <on/off>  ", int(pwalletMain->fCombineDust)));
+    if (pwalletMain->fCombineDust) {
+        obj.push_back(Pair("autocombine threshold set to <Coin Amount>", 
+                           int(pwalletMain->nAutoCombineThreshold)));
+        if (0 == pwalletMain->nAutoCombineBlockFrequency) {
+            obj.push_back(Pair("autocombine block frequency set to ", "one time"));
+        } else {
+            obj.push_back(Pair("autocombine block frequency set to ",
+                           int(pwalletMain->nAutoCombineBlockFrequency)));
+        }
+    }
+
+    return obj;
 }
 
 UniValue printMultiSend()
@@ -2342,7 +2403,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
     string strAddress = params[0].get_str();
     CBitcoinAddress address(strAddress);
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIV address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid GMCN address");
     if (boost::lexical_cast<int>(params[1].get_str()) < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     if (pwalletMain->IsLocked())
@@ -2484,7 +2545,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "mintzerocoin amount ( UTXOs )\n"
-            "amount: (numeric, required) Enter an amount of Piv to convert to zPiv\n"
+            "amount: (numeric, required) Enter an amount of Piv to convert to zGMCN\n"
             "UTXOs: (string, optional) A json array of objects. Each object needs the txid (string) and vout (numeric)\n"
             "     [           (json array of json objects)\n"
             "       {\n"
@@ -2514,7 +2575,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
 
     int64_t nTime = GetTimeMillis();
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zGMCN is currently disabled due to maintenance.");
 
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
@@ -2577,9 +2638,9 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 5 || params.size() < 4)
         throw runtime_error(
             "spendzerocoin <amount> <mintchange [true|false]> <minimizechange [true|false]>  <securitylevel [1-100]> <address>\n"
-            "Overview: Convert zPIV (zerocoins) into PIV. \n"
+            "Overview: Convert zGMCN (zerocoins) into GMCN. \n"
             "amount: amount to spend\n"
-            "mintchange: if there is left over PIV (change), the wallet can convert it automatically back to zerocoins [true]\n"
+            "mintchange: if there is left over GMCN (change), the wallet can convert it automatically back to zerocoins [true]\n"
             "minimizechange: try to minimize the returning change  [false]\n"
             "security level: the amount of checkpoints to add to the accumulator. A checkpoint contains 10 blocks worth of zerocoinmints."
                     "The more checkpoints that are added, the more untraceable the transaction will be. Use [100] to add the maximum amount"
@@ -2591,7 +2652,7 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zGMCN is currently disabled due to maintenance.");
 
     int64_t nTimeStart = GetTimeMillis();
     if (pwalletMain->IsLocked())
@@ -2799,7 +2860,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
 
                 "\nArguments:\n"
                 "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-                "2. \"denomination\"         (integer, optional) Export a specific denomination of zPiv\n"
+                "2. \"denomination\"         (integer, optional) Export a specific denomination of zGMCN\n"
 
                 "\nResult\n"
                 "[                   (array of json object)\n"
@@ -2865,7 +2926,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
                 "\nResult:\n"
                 "\"added\"            (int) the quantity of zerocoin mints that were added\n"
-                "\"value\"            (string) the total zPiv value of zerocoin mints that were added\n"
+                "\"value\"            (string) the total zGMCN value of zerocoin mints that were added\n"
 
                 "\nExamples\n" +
             HelpExampleCli("importzerocoins", "\'[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]\'") +
@@ -2923,7 +2984,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || !params.empty())
         throw runtime_error(
             "reconsiderzerocoins\n"
-                "\nCheck archived zPiv list to see if any mints were added to the blockchain.\n"
+                "\nCheck archived zGMCN list to see if any mints were added to the blockchain.\n"
 
                 "\nResult\n"
                 "[                                 (array of json objects)\n"

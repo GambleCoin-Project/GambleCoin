@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The Gamblecoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -4008,6 +4009,18 @@ void CWallet::AutoCombineDust()
 {
     if (chainActive.Tip()->nTime < (GetAdjustedTime() - 300) || IsLocked()) {
         return;
+    }
+
+    if (0 != nAutoCombineBlockFrequency) {
+        // If the block height hasn't exceeded our frequency; or is not a multiple of our frequency.
+        if ((nAutoCombineBlockFrequency > chainActive.Tip()->nHeight) || 
+            (chainActive.Tip()->nHeight % nAutoCombineBlockFrequency)) {
+            return;
+        }
+    } else {
+        // If nAutoCombineBlockFrequency is 0, it's the special onetime case
+        // so let it rip but turn it off so it doesn't rip again.
+        fCombineDust = 0;
     }
 
     map<CBitcoinAddress, vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineThreshold * COIN);
