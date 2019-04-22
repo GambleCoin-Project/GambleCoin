@@ -1,8 +1,8 @@
 GambleCoin Core integration/staging repository
 =====================================
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ffd48c6acd3a4fe1a1dbae5c5bcb3f2e)](https://app.codacy.com/app/CineXMike/GambleCoin?utm_source=github.com&utm_medium=referral&utm_content=GambleCoin-Project/GambleCoin&utm_campaign=Badge_Grade_Dashboard)
-[![Build Status](https://travis-ci.org/GambleCoin-Project/GambleCoin.svg?branch=master)](https://travis-ci.org/GambleCoin-Project/GambleCoin) [![GitHub version](https://badge.fury.io/gh/GambleCoin-Project%2Fgamblecoin.svg)](https://badge.fury.io/gh/GambleCoin-Project%2Fgamblecoin)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/15b1c38253294c6fac248717cc3d6386)](https://www.codacy.com/app/CaveSpectre11/GambleCoin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GambleCoin-Project/GambleCoin&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/GambleCoin-Project/GambleCoin.svg?branch=master)](https://travis-ci.org/GambleCoin-Project/GambleCoin)
 
 GambleCoin is an open source crypto-currency focused on fast private transactions with low transaction fees & environmental footprint.  It utilizes a custom Proof of Stake protocol for securing its network and uses an innovative variable seesaw reward mechanism that dynamically balances 90% of its block reward size between masternodes and staking nodes and 10% dedicated for budget proposals. The goal of GambleCoin is to achieve a decentralized sustainable crypto currency with near instant full-time private transactions, fair governance and community intelligence.
 - Anonymized transactions.
