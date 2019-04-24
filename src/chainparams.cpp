@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The GambleCoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -159,13 +160,13 @@ public:
         assert(hashGenesisBlock == uint256("0x0000083601e509636901be6882bf942c36c3110bb77365acce6cb1bb5af3e266"));
         assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
-        // TODO
         vSeeds.push_back(CDNSSeedData("45.63.9.248", "45.63.9.248"));
         vSeeds.push_back(CDNSSeedData("149.28.58.153", "149.28.58.153"));
         vSeeds.push_back(CDNSSeedData("199.247.20.46", "199.247.20.46"));
         vSeeds.push_back(CDNSSeedData("95.179.155.34", "95.179.155.34"));
         vSeeds.push_back(CDNSSeedData("144.202.24.71", "144.202.24.71"));
         vSeeds.push_back(CDNSSeedData("45.63.64.91", "45.63.64.91"));
+        vSeeds.push_back(CDNSSeedData("209.250.227.162", "209.250.227.162"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-info.com", 
                                       "gmcn-dnsseed1.gamblecoin-info.com"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-info.com", 
@@ -178,6 +179,8 @@ public:
                                       "gmcn-dnsseed5.gamblecoin-info.com"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed6.gamblecoin-info.com", 
                                       "gmcn-dnsseed6.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed7.gamblecoin-info.com", 
+                                      "gmcn-dnsseed7.gamblecoin-info.com"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-casino.com", 
                                       "gmcn-dnsseed1.gamblecoin-casino.com"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-casino.com", 
@@ -292,7 +295,10 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed-testnet.wildgarlic.fun", "gmcn-dnsseed-testnet.wildgarlic.fun"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed1.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed2.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed3.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed4.gamblecoin-info.com"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed2.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("s3v3nh4cks.ddns.net", "s3v3nh4cks.ddns.net"));
