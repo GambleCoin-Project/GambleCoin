@@ -4051,7 +4051,9 @@ void CWallet::AutoCombineDust()
             nTotalRewardsValue += out.Value();
 
             // Combine until our total is enough above the threshold to remain above after adjustments
-            if ((nTotalRewardsValue - nTotalRewardsValue / 10) > nAutoCombineThreshold * COIN)
+            // If no threshold; we want to combine up to MAX_STANDARD_TX_SIZE
+            if (nAutoCombineThreshold && 
+                ((nTotalRewardsValue - nTotalRewardsValue / 10) > nAutoCombineThreshold * COIN))
                 break;
 
             // Around 180 bytes per input. We use 190 to be certain
@@ -4061,6 +4063,9 @@ void CWallet::AutoCombineDust()
                 break;
             }
         }
+
+        LogPrintf("AutoCombineDust: HasSelected: %d, size: %d, txSizeEstimate: %d, maxSize: %d\n",
+                  coinControl->HasSelected(), vRewardCoins.size(), txSizeEstimate, maxSize);
 
         //if no inputs found then return
         if (!coinControl->HasSelected())
