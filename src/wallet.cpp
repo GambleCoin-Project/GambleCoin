@@ -4064,9 +4064,6 @@ void CWallet::AutoCombineDust()
             }
         }
 
-        LogPrintf("AutoCombineDust: HasSelected: %d, size: %d, txSizeEstimate: %d, maxSize: %d\n",
-                  coinControl->HasSelected(), vRewardCoins.size(), txSizeEstimate, maxSize);
-
         //if no inputs found then return
         if (!coinControl->HasSelected())
             continue;
