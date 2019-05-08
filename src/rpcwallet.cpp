@@ -2155,7 +2155,7 @@ UniValue autocombinerewards(const UniValue& params, bool fHelp)
             "autocombinerewards enable ( threshold ) ( frequency )\n"
             "\nWallet will automatically monitor for UTXOs with values below the threshold amount, "
             "and combine them into transactions sized to the threshold amount, if they reside with "
-            "the same UCC address.\n"
+            "the same Gamblecoin address.\n"
             "\nA threshold value of \"0\" will combine all the UTXOs, up to the maximum possible "
             "within the maximum transaction size of a block.\n"
             "\nA frequency value of \"0\" will run the combine once, on the next available block, "
