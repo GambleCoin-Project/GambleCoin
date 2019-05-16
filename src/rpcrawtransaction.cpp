@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017-2018 The GambleCoin developers
+// Copyright (c) 2017-2019 The GambleCoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -320,7 +320,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 4)
         throw runtime_error(
-            "listunspent ( minconf maxconf  [\"address\",...] )\n"
+            "listunspent ( minconf maxconf  [\"address\",...] watchonlyconfig )\n"
             "\nReturns array of unspent transaction outputs\n"
             "with between minconf and maxconf (inclusive) confirmations.\n"
             "Optionally filter to only include txouts paid to specified addresses.\n"
@@ -334,7 +334,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             "      \"address\"   (string) gamblecoin address\n"
             "      ,...\n"
             "    ]\n"
-            "4. watchonlyconfig  (numberic, optional, default=1) 1 = list regular unspent transactions, 2 = list only watchonly transactions,  3 = list all unspent transactions (including watchonly)\n"
+            "4. watchonlyconfig  (numeric, optional, default=1) 1 = list regular unspent transactions, 2 = list only watchonly transactions,  3 = list all unspent transactions (including watchonly)\n"
             "\nResult\n"
             "[                   (array of json object)\n"
             "  {\n"
