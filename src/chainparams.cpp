@@ -117,7 +117,7 @@ public:
         nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
         nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
         nMaturity = 100;
-        nMasternodeCountDrift = 20;
+        nMasternodePercentDrift = 3;
         nMaxMoneyOut = 15600000 * COIN;
 
         /** Height or Time Based Activations **/
@@ -275,7 +275,7 @@ public:
         nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
         nLastPOWBlock = 200;
         nMaturity = 15;
-        nMasternodeCountDrift = 4;
+        nMasternodePercentDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 15600000 * COIN;
         nZerocoinStartHeight = 22;
