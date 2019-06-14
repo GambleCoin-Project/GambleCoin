@@ -2208,9 +2208,11 @@ int64_t GetBlockValue(int nHeight)
     return nSubsidy;
 }
 
-int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
+int64_t GetMasternodePayment(int nHeight, int64_t blockValue, bool bDrift)
 {
     int64_t ret = 0;
+    int nMasternodeCount = 0;
+    static int lastHeight=0;
 
     // No masternode payments for first 200 blocks on testnet
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
@@ -2220,25 +2222,41 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 
     int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
 
-    //if a mn count is inserted into the function we are looking for a specific result for a masternode count
-    if (nMasternodeCount < 1){
-        if (IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT))
-            nMasternodeCount = mnodeman.stable_size();
-        else
-            nMasternodeCount = mnodeman.size();
-    }
+    if (IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT))
+        nMasternodeCount = mnodeman.stable_size();
+    else
+        nMasternodeCount = mnodeman.size();
 
     int64_t mNodeCoins = nMasternodeCount * 10000 * COIN;
 
-    // Use this log to compare the masternode count for different clients
-    LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight, nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
+    if (bDrift) {
+        int64_t mRawLocked = mNodeCoins;
+        // Add drift wiggle room to the calculation
+        mNodeCoins += (mNodeCoins * ((double)Params().MasternodePercentDrift() / 100));
+        if (fDebug && (nHeight != lastHeight)) {
+            LogPrintf("GetMasternodePayment(): Adding %d%% to %s locked coins. " 
+	              "Using %s to generate minimum required payment.\n", 
+                      (int)Params().MasternodePercentDrift(), FormatMoney(mRawLocked).c_str(), 
+                      FormatMoney(mNodeCoins).c_str());
+        }
+    }
 
-    if (fDebug)
-        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
-            FormatMoney(mNodeCoins).c_str());
+    if (fDebug && (nHeight != lastHeight)) {
+        LogPrintf("GetSeeSaw(): Calculating Masternode Reward when Coin Supply is %s and Locked Coins are %s\n", 
+                  FormatMoney(nMoneySupply).c_str(), FormatMoney(mNodeCoins).c_str());
+    }
 
     if (mNodeCoins == 0) {
-        ret = 0;
+        /*
+        ** If there aren't any masternodes; we don't want to give the full reward to the
+        ** staker, because that, at best, would discourage someone from creating a masternode.
+        ** It also would only be possible if masternode payments aren't being enforced. 
+        ** It also opens up a vulnerability for gaming if there is very few masternodes, as
+        ** drift would need to account for the possibility of a legit staker not seeing
+        ** the masternode.  By giving the staker very little for no masternodes, both issues
+        ** are solved.
+        */
+        ret = blockValue * .90;
     } else {
         if (mNodeCoins <= (nMoneySupply * .01) && mNodeCoins > 0) {
             ret = blockValue * .90;
@@ -2414,6 +2432,15 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
             ret = blockValue * .01;
         }
     }
+
+    if (fDebug && (nHeight != lastHeight)) {
+        LogPrintf("GetMasternodePayment(): Calculated Masternode to receive %s%s of the %s Block Reward\n", 
+                  bDrift ? "at least " : "",
+                  FormatMoney(ret).c_str(),
+                  FormatMoney(blockValue).c_str());
+    }
+
+    lastHeight = nHeight; // save the height so we don't keep issuing the same messages
 
     return ret;
 }
