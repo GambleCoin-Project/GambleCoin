@@ -89,6 +89,36 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params() const
     return &ZCParams;
 }
 
+void MineGenesis(CBlock genesis)
+{
+    printf("Searching for genesis block...\n");
+    // This will figure out a valid hash and Nonce if you're
+    // creating a different genesis block:
+    uint256 hashTarget = ~uint256(0) >> 20;
+    uint256 thash;
+    while(true)
+    {
+        thash = genesis.GetHash();
+        if (thash <= hashTarget)
+            break;
+        if ((genesis.nNonce & 0xFFF) == 0)
+        {
+            printf("nonce %u: hash = %s \n", genesis.nNonce, thash.ToString().c_str());
+        }
+        ++genesis.nNonce;
+        if (genesis.nNonce == 0)
+        {
+            printf("NONCE WRAPPED, incrementing time\n");
+            ++genesis.nTime;
+        }
+    }
+    printf("block.nTime = %u \n", genesis.nTime);
+    printf("block.nNonce = %u \n", genesis.nNonce);
+    printf("block.GetHash = %s\n", genesis.GetHash().ToString().c_str());
+    printf("block.merkle = %s\n", genesis.hashMerkleRoot.ToString().c_str());
+    std::fflush(stdout);
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -271,15 +301,15 @@ public:
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
-        nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
+        nTargetTimespan = 5 * 10; // GAMBLECOIN: 7.5 minutes
+        nTargetSpacing = 1 * 10;  // GAMBLECOIN: 90 seconds
         nLastPOWBlock = 200;
         nMaturity = 15;
         nMasternodePercentDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 15600000 * COIN;
-        nZerocoinStartHeight = 22;
-        nZerocoinStartTime = 1520288156; // Monday, 5 March 2018 22:15:56
+        nZerocoinStartHeight = 999999999;
+        nZerocoinStartTime = 4294967295; // No more for testnet, so genesis block can be created
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
         nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
@@ -287,12 +317,14 @@ public:
         nBlockEnforceInvalidUTXO = 0; //Start enforcing the invalid UTXO's
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1520273549; // Monday, 5 March 2018 18:12:29
-        genesis.nNonce = 4080330;
+        genesis.nTime = 1560527643; // 06/14/2019 @ 3:54pm (UTC)
+        genesis.nNonce = 5022364;
+
+        //MineGenesis(genesis);
 
         hashGenesisBlock = genesis.GetHash();
         // printf("%s\n", hashGenesisBlock.ToString().c_str());
-        assert(hashGenesisBlock == uint256("0x00000913ee74f5160ac5de4ed92e5c8873886fde415978f79e20202fcf2435cc"));
+        assert(hashGenesisBlock == uint256("0000089b9c6466dfc2d93aeac8d91e7f8eedd6b02f9b2dce0b1f0dd80c143153"));
 
         vFixedSeeds.clear();
         vSeeds.clear();

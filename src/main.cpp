@@ -4204,6 +4204,9 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     else
         CheckForkWarningConditions();
 
+    if ((nHeight == 0) && (fInvalidFound))
+        return false; // Genesis Block Failed
+
     return true;
 }
 
@@ -4547,13 +4550,17 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
 
     // Version 4 header must be used after Params().Zerocoin_StartHeight(). And never before.
     if (block.GetBlockTime() > Params().Zerocoin_StartTime()) {
-        if(block.nVersion < Params().Zerocoin_HeaderVersion())
+        if(block.nVersion < Params().Zerocoin_HeaderVersion()) {
+            LogPrintf("CheckBlockHeader: blocktime %ul > starttime %ul\n", block.GetBlockTime(), Params().Zerocoin_StartTime());
             return state.DoS(50, error("CheckBlockHeader() : block version must be above 4 after ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
+        }
     } else {
-        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
+        if (block.nVersion >= Params().Zerocoin_HeaderVersion()) {
+            LogPrintf("CheckBlockHeader: blocktime %ul > starttime %ul\n", block.GetBlockTime(), Params().Zerocoin_StartTime());
             return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
+	}
     }
 
     return true;
