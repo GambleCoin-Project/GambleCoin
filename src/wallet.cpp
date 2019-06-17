@@ -4068,8 +4068,9 @@ void CWallet::AutoCombineDust()
         if (!coinControl->HasSelected())
             continue;
 
-        //we cannot combine one coin with itself
-        if (vRewardCoins.size() <= 1)
+        //we cannot combine one coin with itself, nor do we want to constantly 
+        //recombine the previous combine results (Result UTXO + Change UTXO).
+        if (vRewardCoins.size() <= 2)
             continue;
 
         vector<pair<CScript, CAmount> > vecSend;
