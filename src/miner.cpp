@@ -33,7 +33,7 @@ using namespace std;
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// GAMBLECOINMiner
+// BitcoinMiner
 //
 
 //
@@ -495,6 +495,21 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet,
     if (!reservekey.GetReservedKey(pubkey))
         return NULL;
 
+    const int nHeightNext = chainActive.Tip()->nHeight + 1;
+    static int nLastPOWBlock = Params().LAST_POW_BLOCK();
+
+    // If we're building a premature PoS block, abort.
+    if ((nHeightNext <= nLastPOWBlock) && fProofOfStake) {
+        LogPrintf("CreateNewBlockWithKey(): Aborting PoS block creation during PoW phase\n");
+        return NULL;
+    }
+
+    // If we're building a late PoW block, abort.
+    if ((nHeightNext > nLastPOWBlock) && !fProofOfStake) {
+        LogPrintf("CreateNewBlockWithKey(): Aborting PoW block creation during PoS phase\n");
+        return NULL;
+    }
+
     CScript scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
     return CreateNewBlock(scriptPubKey, pwallet, fProofOfStake);
 }
@@ -508,7 +523,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
-            return error("GAMBLECOINMiner : generated block is stale");
+            return error("Miner : generated block is stale");
     }
 
     // Remove key from key pool
@@ -526,7 +541,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Process this block the same as if we had received it from another node
     CValidationState state;
     if (!ProcessNewBlock(state, NULL, pblock))
-        return error("GAMBLECOINMiner : ProcessNewBlock, block not accepted");
+        return error("Miner : ProcessNewBlock, block not accepted");
 
     for (CNode* node : vNodes) {
         node->PushInventory(CInv(MSG_BLOCK, pblock->GetHash()));
@@ -536,12 +551,14 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 }
 
 bool fGenerateBitcoins = false;
+bool fMintableCoins = false;
+int nMintableLastCheck = 0;
 
 // ***TODO*** that part changed in bitcoin, we are using a mix with old one here for now
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
-    LogPrintf("GAMBLECOINMiner started\n");
+    LogPrintf("Miner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("gamblecoin-miner");
 
@@ -549,11 +566,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     CReserveKey reservekey(pwallet);
     unsigned int nExtraNonce = 0;
 
-    //control the amount of times the client will check for mintable coins
-    static bool fMintableCoins = false;
-    static int nMintableLastCheck = 0;
-
-    if (fProofOfStake && (GetTime() - nMintableLastCheck > 5 * 60)) // 5 minute check time
+    if (fProofOfStake && !nMintableLastCheck)
     {
         nMintableLastCheck = GetTime();
         fMintableCoins = pwallet->MintableCoins();
@@ -562,16 +575,28 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     while (fGenerateBitcoins || fProofOfStake) {
         if (fProofOfStake) {
             if (chainActive.Tip()->nHeight < Params().LAST_POW_BLOCK()) {
-                MilliSleep(5000);
+                // The last POW block hasn't even been mined yet.
+                MilliSleep(Params().TargetSpacing() * 1000);
                 continue;
+            }
+
+            // Periodically check if we have mintable coins
+            if (GetTime() - nMintableLastCheck > 1 * 60) // 1 minute check time
+            {
+                nMintableLastCheck = GetTime();
+                fMintableCoins = pwallet->MintableCoins();
             }
 
             while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || 
                    nReserveBalance >= pwallet->GetBalance() || !masternodeSync.IsSynced()) {
                 nLastCoinStakeSearchInterval = 0;
                 MilliSleep(5000);
-                if (!fGenerateBitcoins && !fProofOfStake)
-                    continue;
+                // recheck if we have mintable coins, while waiting to be stakable.
+                if (GetTime() - nMintableLastCheck > 1 * 60) // 1 minute check time
+                {
+                    nMintableLastCheck = GetTime();
+                    fMintableCoins = pwallet->MintableCoins();
+                }
             }
 
             if (mapHashedBlocks.count(chainActive.Tip()->nHeight)) //search our map of hashed blocks, see if bestblock has been hashed yet
@@ -582,7 +607,14 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                     continue;
                 }
             }
-        }
+        } else { // PoW
+            if (chainActive.Tip()->nHeight > Params().LAST_POW_BLOCK())
+            {
+                LogPrintf("Miner(): Exiting Proof of Work Mining Thread at height: %d\n",
+                          chainActive.Tip()->nHeight );
+                return;
+            }
+       }
 
         //
         // Create new block
@@ -616,7 +648,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
             continue;
         }
 
-        LogPrintf("Running GAMBLECOINMiner with %u transactions in block (%u bytes)\n", pblock->vtx.size(),
+        LogPrintf("Running Miner with %u transactions in block (%u bytes)\n", pblock->vtx.size(),
             ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
