@@ -128,3 +128,12 @@ qa/pull-tester/test.*/*
 .idea
 CMakeLists.txt
 cmake-build-debug
+
+# Qt Creator
+Gamblecoin.cflags
+Gamblecoin.config
+Gamblecoin.creator
+Gamblecoin.creator.user
+Gamblecoin.cxxflags
+Gamblecoin.files
+Gamblecoin.includes
