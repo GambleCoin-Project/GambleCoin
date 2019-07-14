@@ -501,12 +501,14 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet,
     // If we're building a premature PoS block, abort.
     if ((nHeightNext <= nLastPOWBlock) && fProofOfStake) {
         LogPrintf("CreateNewBlockWithKey(): Aborting PoS block creation during PoW phase\n");
+        // We will sleep in BitcoinMiner() anyway, if this even gets to this point
         return NULL;
     }
 
     // If we're building a late PoW block, abort.
     if ((nHeightNext > nLastPOWBlock) && !fProofOfStake) {
         LogPrintf("CreateNewBlockWithKey(): Aborting PoW block creation during PoS phase\n");
+        MilliSleep((Params().TargetSpacing() * 1000) >> 1);  // sleep 1/2 a block time so we don't go into a tight loop.
         return NULL;
     }
 
@@ -608,8 +610,9 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 }
             }
         } else { // PoW
-            if (chainActive.Tip()->nHeight > Params().LAST_POW_BLOCK())
+            if ((chainActive.Tip()->nHeight - 6) > Params().LAST_POW_BLOCK())
             {
+                // Run for a little while longer, just in case there is a rewind on the chain.
                 LogPrintf("Miner(): Exiting Proof of Work Mining Thread at height: %d\n",
                           chainActive.Tip()->nHeight );
                 return;
