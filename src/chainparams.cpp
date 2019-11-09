@@ -190,14 +190,10 @@ public:
         assert(hashGenesisBlock == uint256("0x0000083601e509636901be6882bf942c36c3110bb77365acce6cb1bb5af3e266"));
         assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
-        vSeeds.push_back(CDNSSeedData("116.203.139.168", "116.203.139.168"));
-        vSeeds.push_back(CDNSSeedData("159.69.108.130", "159.69.108.130"));
-        vSeeds.push_back(CDNSSeedData("116.203.126.156", "116.203.126.156"));
         vSeeds.push_back(CDNSSeedData("199.247.20.46", "199.247.20.46"));
         vSeeds.push_back(CDNSSeedData("95.179.155.34", "95.179.155.34"));
         vSeeds.push_back(CDNSSeedData("144.202.24.71", "144.202.24.71"));
         vSeeds.push_back(CDNSSeedData("45.63.64.91", "45.63.64.91"));
-        vSeeds.push_back(CDNSSeedData("209.250.227.162", "209.250.227.162"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-info.com", 
                                       "gmcn-dnsseed1.gamblecoin-info.com"));
         vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-info.com", 
