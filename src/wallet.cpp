@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The Gamblecoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -2954,10 +2955,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             //presstab HyperStake - calculate the total size of our new output including the stake reward so that we can use it to decide whether to split the stake outputs
             const CBlockIndex* pIndex0 = chainActive.Tip();
-            uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetBlockValue(pIndex0->nHeight);
+            uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetBlockValue(pIndex0->nHeight+1);
 
             //presstab HyperStake - if MultiSend is set to send in coinstake we will add our outputs here (values asigned further down)
-            if (nTotalSize / 2 > nStakeSplitThreshold * COIN)
+            if ((nTotalSize >> 1) > nStakeSplitThreshold * COIN)
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
             if (fDebug && GetBoolArg("-printcoinstake", false))
@@ -2981,7 +2982,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     while (true) {
         // Set output amount
         if (txNew.vout.size() == 3) {
-            txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 / CENT) * CENT;
+            txNew.vout[1].nValue = ((nCredit - nMinFee) >> 1);
             txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
         } else
             txNew.vout[1].nValue = nCredit - nMinFee;
@@ -4010,11 +4011,24 @@ void CWallet::AutoCombineDust()
         return;
     }
 
+    if (0 != nAutoCombineBlockFrequency) {
+        // If the block height hasn't exceeded our frequency; or is not a multiple of our frequency.
+        if ((nAutoCombineBlockFrequency > chainActive.Tip()->nHeight) || 
+            (chainActive.Tip()->nHeight % nAutoCombineBlockFrequency)) {
+            return;
+        }
+    } else {
+        // If nAutoCombineBlockFrequency is 0, it's the special onetime case
+        // so let it rip but turn it off so it doesn't rip again.
+        fCombineDust = 0;
+    }
+
     map<CBitcoinAddress, vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineThreshold * COIN);
 
     //coins are sectioned by address. This combination code only wants to combine inputs that belong to the same address
     for (map<CBitcoinAddress, vector<COutput> >::iterator it = mapCoinsByAddress.begin(); it != mapCoinsByAddress.end(); it++) {
         vector<COutput> vCoins, vRewardCoins;
+        bool maxSize = false;
         vCoins = it->second;
 
         // We don't want the tx to be refused for being too large
@@ -4028,7 +4042,7 @@ void CWallet::AutoCombineDust()
             if (!out.fSpendable)
                 continue;
             //no coins should get this far if they dont have proper maturity, this is double checking
-            if (out.tx->IsCoinStake() && out.tx->GetDepthInMainChain() < COINBASE_MATURITY + 1)
+            if (out.tx->IsCoinStake() && out.tx->GetDepthInMainChain() < Params().COINBASE_MATURITY() + 1)
                 continue;
 
             COutPoint outpt(out.tx->GetHash(), out.i);
@@ -4036,22 +4050,27 @@ void CWallet::AutoCombineDust()
             vRewardCoins.push_back(out);
             nTotalRewardsValue += out.Value();
 
-            // Combine to the threshold and not way above
-            if (nTotalRewardsValue > nAutoCombineThreshold * COIN)
+            // Combine until our total is enough above the threshold to remain above after adjustments
+            // If no threshold; we want to combine up to MAX_STANDARD_TX_SIZE
+            if (nAutoCombineThreshold && 
+                ((nTotalRewardsValue - nTotalRewardsValue / 10) > nAutoCombineThreshold * COIN))
                 break;
 
             // Around 180 bytes per input. We use 190 to be certain
             txSizeEstimate += 190;
-            if (txSizeEstimate >= MAX_STANDARD_TX_SIZE - 200)
+            if (txSizeEstimate >= MAX_STANDARD_TX_SIZE - 200) {
+                maxSize = true;
                 break;
+            }
         }
 
         //if no inputs found then return
         if (!coinControl->HasSelected())
             continue;
 
-        //we cannot combine one coin with itself
-        if (vRewardCoins.size() <= 1)
+        //we cannot combine one coin with itself, nor do we want to constantly 
+        //recombine the previous combine results (Result UTXO + Change UTXO).
+        if (vRewardCoins.size() <= 2)
             continue;
 
         vector<pair<CScript, CAmount> > vecSend;
@@ -4081,7 +4100,7 @@ void CWallet::AutoCombineDust()
         }
 
         //we don't combine below the threshold unless the fees are 0 to avoid paying fees over fees over fees
-        if (nTotalRewardsValue < nAutoCombineThreshold * COIN && nFeeRet > 0)
+        if (!maxSize && vecSend[0].second < nAutoCombineThreshold * COIN && nFeeRet > 0)
             continue;
 
         if (!CommitTransaction(wtx, keyChange)) {
@@ -4089,7 +4108,8 @@ void CWallet::AutoCombineDust()
             continue;
         }
 
-        LogPrintf("AutoCombineDust sent transaction\n");
+        LogPrintf("AutoCombineDust sent transaction. Fee=%d, Total Value=%d Sending=%d\n",
+                  nFeeRet, nTotalRewardsValue, vecSend[0].second);
 
         delete coinControl;
     }

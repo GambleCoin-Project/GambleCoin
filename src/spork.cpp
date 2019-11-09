@@ -41,6 +41,12 @@ void LoadSporksFromDB()
             continue;
         }
 
+        // override zerocoin spork
+        if (SPORK_16_ZEROCOIN_MAINTENANCE_MODE == spork.nSporkID) {
+            LogPrintf("%s : override %s spork from %ul\n", __func__, strSpork, spork.nValue);
+            spork.nValue = SPORK_16_ZEROCOIN_MAINTENANCE_MODE_DEFAULT;
+        }
+
         // add spork to memory
         mapSporks[spork.GetHash()] = spork;
         mapSporksActive[spork.nSporkID] = spork;
@@ -72,6 +78,12 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
         // Ignore spork messages about unknown/deleted sporks
         std::string strSpork = sporkManager.GetSporkNameByID(spork.nSporkID);
         if (strSpork == "Unknown") return;
+
+        // Ignore zerocoin sporks
+        if (SPORK_16_ZEROCOIN_MAINTENANCE_MODE == spork.nSporkID) {
+            LogPrintf("%s : reject %s spork in block %d\n", __func__,  strSpork, chainActive.Tip()->nHeight);
+            return;
+        }
 
         uint256 hash = spork.GetHash();
         if (mapSporksActive.count(spork.nSporkID)) {

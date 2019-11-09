@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The GambleCoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -1292,7 +1293,7 @@ bool ContextualCheckCoinSpend(const CoinSpend& spend, CBlockIndex* pindex, const
     int nHeightTxSpend = 0;
     if (IsSerialInBlockchain(spend.getCoinSerialNumber(), nHeightTxSpend)) {
         if(!fVerifyingBlocks || (fVerifyingBlocks && pindex->nHeight > nHeightTxSpend))
-            return error("%s : zPiv with serial %s is already in the block %d\n", __func__,
+            return error("%s : zGMCN with serial %s is already in the block %d\n", __func__,
                          spend.getCoinSerialNumber().GetHex(), nHeightTxSpend);
     }
 
@@ -1612,7 +1613,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             //Check that txid is not already in the chain
             int nHeightTx = 0;
             if (IsTransactionInChain(tx.GetHash(), nHeightTx))
-                return state.Invalid(error("AcceptToMemoryPool : zPiv spend tx %s already in block %d", tx.GetHash().GetHex(), nHeightTx),
+                return state.Invalid(error("AcceptToMemoryPool : zGMCN spend tx %s already in block %d", tx.GetHash().GetHex(), nHeightTx),
                                      REJECT_DUPLICATE, "bad-txns-inputs-spent");
 
             //Check for double spending of serial #'s
@@ -2207,9 +2208,11 @@ int64_t GetBlockValue(int nHeight)
     return nSubsidy;
 }
 
-int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
+int64_t GetMasternodePayment(int nHeight, int64_t blockValue, bool bDrift)
 {
     int64_t ret = 0;
+    int nMasternodeCount = 0;
+    static int lastHeight=0;
 
     // No masternode payments for first 200 blocks on testnet
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
@@ -2219,25 +2222,41 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 
     int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
 
-    //if a mn count is inserted into the function we are looking for a specific result for a masternode count
-    if (nMasternodeCount < 1){
-        if (IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT))
-            nMasternodeCount = mnodeman.stable_size();
-        else
-            nMasternodeCount = mnodeman.size();
-    }
+    if (IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT))
+        nMasternodeCount = mnodeman.stable_size();
+    else
+        nMasternodeCount = mnodeman.size();
 
     int64_t mNodeCoins = nMasternodeCount * 10000 * COIN;
 
-    // Use this log to compare the masternode count for different clients
-    LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight, nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
+    if (bDrift) {
+        int64_t mRawLocked = mNodeCoins;
+        // Add drift wiggle room to the calculation
+        mNodeCoins += (mNodeCoins * ((double)Params().MasternodePercentDrift() / 100));
+        if (fDebug && (nHeight != lastHeight)) {
+            LogPrintf("GetMasternodePayment(): Adding %d%% to %s locked coins. " 
+	              "Using %s to generate minimum required payment.\n", 
+                      (int)Params().MasternodePercentDrift(), FormatMoney(mRawLocked).c_str(), 
+                      FormatMoney(mNodeCoins).c_str());
+        }
+    }
 
-    if (fDebug)
-        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
-            FormatMoney(mNodeCoins).c_str());
+    if (fDebug && (nHeight != lastHeight)) {
+        LogPrintf("GetSeeSaw(): Calculating Masternode Reward when Coin Supply is %s and Locked Coins are %s\n", 
+                  FormatMoney(nMoneySupply).c_str(), FormatMoney(mNodeCoins).c_str());
+    }
 
     if (mNodeCoins == 0) {
-        ret = 0;
+        /*
+        ** If there aren't any masternodes; we don't want to give the full reward to the
+        ** staker, because that, at best, would discourage someone from creating a masternode.
+        ** It also would only be possible if masternode payments aren't being enforced. 
+        ** It also opens up a vulnerability for gaming if there is very few masternodes, as
+        ** drift would need to account for the possibility of a legit staker not seeing
+        ** the masternode.  By giving the staker very little for no masternodes, both issues
+        ** are solved.
+        */
+        ret = blockValue * .90;
     } else {
         if (mNodeCoins <= (nMoneySupply * .01) && mNodeCoins > 0) {
             ret = blockValue * .90;
@@ -2413,6 +2432,15 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
             ret = blockValue * .01;
         }
     }
+
+    if (fDebug && (nHeight != lastHeight)) {
+        LogPrintf("GetMasternodePayment(): Calculated Masternode to receive %s%s of the %s Block Reward\n", 
+                  bDrift ? "at least " : "",
+                  FormatMoney(ret).c_str(),
+                  FormatMoney(blockValue).c_str());
+    }
+
+    lastHeight = nHeight; // save the height so we don't keep issuing the same messages
 
     return ret;
 }
@@ -3583,7 +3611,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
-    CAmount nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
+    CAmount nExpectedMint = GetBlockValue(pindex->nHeight);
+
+    if (210000 == pindex->nHeight) {
+        // Account for that one wrong block
+        LogPrintf("ConnectBlock(): Ignoring overmint at block %d\n", pindex->nHeight);
+        nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
+    }
+
     if (block.IsProofOfWork())
         nExpectedMint += nFees;
 
@@ -3780,9 +3815,11 @@ void static UpdateTip(CBlockIndex* pindexNew)
 {
     chainActive.SetTip(pindexNew);
 
+#ifdef ENABLE_WALLET
     // If turned on AutoZeromint will automatically convert GMCN to zGMCN
-    if (pwalletMain->isZeromintEnabled ())
-        pwalletMain->AutoZeromint ();
+    if (pwalletMain && pwalletMain->isZeromintEnabled())
+        pwalletMain->AutoZeromint();
+#endif // ENABLE_WALLET
 
     // New best block
     nTimeBestReceived = GetTime();
@@ -4167,6 +4204,9 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     else
         CheckForkWarningConditions();
 
+    if ((nHeight == 0) && (fInvalidFound))
+        return false; // Genesis Block Failed
+
     return true;
 }
 
@@ -4510,13 +4550,17 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
 
     // Version 4 header must be used after Params().Zerocoin_StartHeight(). And never before.
     if (block.GetBlockTime() > Params().Zerocoin_StartTime()) {
-        if(block.nVersion < Params().Zerocoin_HeaderVersion())
+        if(block.nVersion < Params().Zerocoin_HeaderVersion()) {
+            LogPrintf("CheckBlockHeader: blocktime %ul > starttime %ul\n", block.GetBlockTime(), Params().Zerocoin_StartTime());
             return state.DoS(50, error("CheckBlockHeader() : block version must be above 4 after ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
+        }
     } else {
-        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
+        if (block.nVersion >= Params().Zerocoin_HeaderVersion()) {
+            LogPrintf("CheckBlockHeader: blocktime %ul > starttime %ul\n", block.GetBlockTime(), Params().Zerocoin_StartTime());
             return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
+	}
     }
 
     return true;
@@ -4650,7 +4694,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                 if (txIn.scriptSig.IsZerocoinSpend()) {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txIn);
                     if (count(vBlockSerials.begin(), vBlockSerials.end(), spend.getCoinSerialNumber()))
-                        return state.DoS(100, error("%s : Double spending of zPiv serial %s in block\n Block: %s",
+                        return state.DoS(100, error("%s : Double spending of zGMCN serial %s in block\n Block: %s",
                                                     __func__, spend.getCoinSerialNumber().GetHex(), block.ToString()));
                     vBlockSerials.emplace_back(spend.getCoinSerialNumber());
                 }
@@ -5013,7 +5057,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
     }
     if (nMints || nSpends)
-        LogPrintf("%s : block contains %d zPiv mints and %d zPiv spends\n", __func__, nMints, nSpends);
+        LogPrintf("%s : block contains %d zGMCN mints and %d zGMCN spends\n", __func__, nMints, nSpends);
 
     // ppcoin: check proof-of-stake
     // Limited duplicity on stake: prevents block flood attack
@@ -6882,7 +6926,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
     } else {
         //probably one the extensions
-        obfuScationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv);
+        //obfuScationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv);
         mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
         budget.ProcessMessage(pfrom, strCommand, vRecv);
         masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);

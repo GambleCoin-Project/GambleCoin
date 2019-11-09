@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018-2019 The GambleCoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -88,6 +89,36 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params() const
     return &ZCParams;
 }
 
+void MineGenesis(CBlock genesis)
+{
+    printf("Searching for genesis block...\n");
+    // This will figure out a valid hash and Nonce if you're
+    // creating a different genesis block:
+    uint256 hashTarget = ~uint256(0) >> 20;
+    uint256 thash;
+    while(true)
+    {
+        thash = genesis.GetHash();
+        if (thash <= hashTarget)
+            break;
+        if ((genesis.nNonce & 0xFFF) == 0)
+        {
+            printf("nonce %u: hash = %s \n", genesis.nNonce, thash.ToString().c_str());
+        }
+        ++genesis.nNonce;
+        if (genesis.nNonce == 0)
+        {
+            printf("NONCE WRAPPED, incrementing time\n");
+            ++genesis.nTime;
+        }
+    }
+    printf("block.nTime = %u \n", genesis.nTime);
+    printf("block.nNonce = %u \n", genesis.nNonce);
+    printf("block.GetHash = %s\n", genesis.GetHash().ToString().c_str());
+    printf("block.merkle = %s\n", genesis.hashMerkleRoot.ToString().c_str());
+    std::fflush(stdout);
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -116,7 +147,7 @@ public:
         nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
         nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
         nMaturity = 100;
-        nMasternodeCountDrift = 20;
+        nMasternodePercentDrift = 3;
         nMaxMoneyOut = 15600000 * COIN;
 
         /** Height or Time Based Activations **/
@@ -159,8 +190,36 @@ public:
         assert(hashGenesisBlock == uint256("0x0000083601e509636901be6882bf942c36c3110bb77365acce6cb1bb5af3e266"));
         assert(genesis.hashMerkleRoot == uint256("0x0e8b5b16874da8f82dc7463729f3f63964a5e6f5fea04f0d163e89ae6b9dd1d0"));
 
-        // TODO
-        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed.wildgarlic.fun", "gmcn-dnsseed.wildgarlic.fun"));
+        vSeeds.push_back(CDNSSeedData("199.247.20.46", "199.247.20.46"));
+        vSeeds.push_back(CDNSSeedData("95.179.155.34", "95.179.155.34"));
+        vSeeds.push_back(CDNSSeedData("144.202.24.71", "144.202.24.71"));
+        vSeeds.push_back(CDNSSeedData("45.63.64.91", "45.63.64.91"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-info.com", 
+                                      "gmcn-dnsseed1.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-info.com", 
+                                      "gmcn-dnsseed2.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed3.gamblecoin-info.com", 
+                                      "gmcn-dnsseed3.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed4.gamblecoin-info.com", 
+                                      "gmcn-dnsseed4.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed5.gamblecoin-info.com", 
+                                      "gmcn-dnsseed5.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed6.gamblecoin-info.com", 
+                                      "gmcn-dnsseed6.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed7.gamblecoin-info.com", 
+                                      "gmcn-dnsseed7.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed1.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed1.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed2.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed2.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed3.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed3.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed4.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed4.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed5.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed5.gamblecoin-casino.com"));
+        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed6.gamblecoin-casino.com", 
+                                      "gmcn-dnsseed6.gamblecoin-casino.com"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed.fuzzbawls.pw"));     // Primary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin.seed2.fuzzbawls.pw"));    // Secondary DNS Seeder from Fuzzbawls
         // vSeeds.push_back(CDNSSeedData("coin-server.com", "coin-server.com"));         // Single node address
@@ -190,7 +249,7 @@ public:
         fHeadersFirstSyncingActive = false;
 
         nPoolMaxTransactions = 3;
-        strSporkKey = "043585edf16b2d1680c53b4feee9f8b824f1f8eda11315fd781951b021c8d91385bb645e36c8b5498c3db288c0af6a48ecab44f73bf0ff0b378c631366c00cf6ec";
+        strSporkKey = "0472051a23509903ea43663b3677890b32baf069db61327187b1d7d55d0e6481bbde8c7b2e8d999b134bae749828bf9aac5443f494de3467c3d752b3fcd511f132";
         strObfuscationPoolDummyAddress = "D87q2gC9j6nNrnzCsg4aY6bHMLsT9nUhEw";
         nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
 
@@ -238,15 +297,15 @@ public:
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 5 * 90; // GAMBLECOIN: 7.5 minutes
-        nTargetSpacing = 1 * 90;  // GAMBLECOIN: 90 seconds
+        nTargetTimespan = 5 * 10; // GAMBLECOIN: 7.5 minutes
+        nTargetSpacing = 1 * 10;  // GAMBLECOIN: 90 seconds
         nLastPOWBlock = 200;
         nMaturity = 15;
-        nMasternodeCountDrift = 4;
+        nMasternodePercentDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 15600000 * COIN;
-        nZerocoinStartHeight = 22;
-        nZerocoinStartTime = 1520288156; // Monday, 5 March 2018 22:15:56
+        nZerocoinStartHeight = 999999999;
+        nZerocoinStartTime = 4294967295; // No more for testnet, so genesis block can be created
         nBlockEnforceSerialRange = 0; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 0; //Trigger a recalculation of accumulators GAMBLECOIN: This is not used
         nBlockFirstFraudulent = 0; //First block that bad serials emerged GAMBLECOIN: This is not used
@@ -254,16 +313,21 @@ public:
         nBlockEnforceInvalidUTXO = 0; //Start enforcing the invalid UTXO's
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1520273549; // Monday, 5 March 2018 18:12:29
-        genesis.nNonce = 4080330;
+        genesis.nTime = 1560527643; // 06/14/2019 @ 3:54pm (UTC)
+        genesis.nNonce = 5022364;
+
+        //MineGenesis(genesis);
 
         hashGenesisBlock = genesis.GetHash();
         // printf("%s\n", hashGenesisBlock.ToString().c_str());
-        assert(hashGenesisBlock == uint256("0x00000913ee74f5160ac5de4ed92e5c8873886fde415978f79e20202fcf2435cc"));
+        assert(hashGenesisBlock == uint256("0000089b9c6466dfc2d93aeac8d91e7f8eedd6b02f9b2dce0b1f0dd80c143153"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("gmcn-dnsseed-testnet.wildgarlic.fun", "gmcn-dnsseed-testnet.wildgarlic.fun"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed1.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed2.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed3.gamblecoin-info.com"));
+        vSeeds.push_back(CDNSSeedData("gamblecoin-info.com", "testnet.seed4.gamblecoin-info.com"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("fuzzbawls.pw", "gamblecoin-testnet.seed2.fuzzbawls.pw"));
         // vSeeds.push_back(CDNSSeedData("s3v3nh4cks.ddns.net", "s3v3nh4cks.ddns.net"));
@@ -289,7 +353,7 @@ public:
         fTestnetToBeDeprecatedFieldRPC = true;
 
         nPoolMaxTransactions = 2;
-        strSporkKey = "045605a12a910328b1c104453c12dfe56cd0a407e17a73e8ab7db7f031ffb3f026186401fcd38c18f1b73c7db939952ce51710c673b97b41f65289bc43eacc2c20";
+        strSporkKey = "04bc5bd381118f388d17d571ec35bf0535d64ff42baef174515e2925fd7d16c4d62036d52126678e4be7d8a0e009b24d72087de34d467c2dbdeb43bcfc8769e43b";
         strObfuscationPoolDummyAddress = "y57cqfGRkekRyDRNeJiLtYVEbvhXrNbmox";
         nStartMasternodePayments = 1403728576; //Wed, 25 Jun 2014 20:36:16 GMT
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
